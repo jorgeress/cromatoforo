@@ -50,50 +50,38 @@
     },
 
     // ── Sistema ──────────────────────────────────────────
-    { "type": "os",           "key": "  OS" },
-    { "type": "host",         "key": " 󰌢 Equipo" },
-    { "type": "kernel",       "key": "  Kernel" },
-    { "type": "uptime",       "key": " 󰅐 Encendido" },
-    { "type": "packages",     "key": " 󰏖 Paquetes" },
-    { "type": "shell",        "key": "  Shell" },
-    { "type": "terminal",     "key": "  Terminal" },
-    { "type": "terminalfont", "key": "  Fuente term" },
-    { "type": "wm",           "key": "  WM" },
+    { "type": "os",           "key": "OS" },
+    { "type": "host",         "key": "Equipo" },
+    { "type": "kernel",       "key": "Kernel" },
+    { "type": "packages",     "key": "Paquetes" },
+    { "type": "shell",        "key": "Shell" },
+    { "type": "terminal",     "key": "Terminal" },
+    { "type": "terminalfont", "key": "Fuente term" },
+    { "type": "wm",           "key": "WM" },
     "break",
 
     // ── Hardware ─────────────────────────────────────────
-    { "type": "cpu",          "key": "  CPU", "showPeCoreCount": true },
-    { "type": "gpu",          "key": " 󰢮 GPU" },
-    { "type": "memory",       "key": "  Memoria" },
-    { "type": "swap",         "key": " 󰓡 Swap" },
-    { "type": "disk",         "key": "  Disco" },
-    { "type": "battery",      "key": "  Bateria" },
+    { "type": "cpu",          "key": "CPU", "showPeCoreCount": true },
+    { "type": "gpu",          "key": "GPU" },
+    { "type": "memory",       "key": "Memoria" },
+    { "type": "disk",         "key": "Disco" },
+    { "type": "battery",      "key": "Bateria" },
     "break",
 
     // ── Escritorio y estetica ────────────────────────────
     // font/theme/icons leen ~/.config/gtk-3.0|4.0/settings.ini. Funcionan
     // desde que se configuro GTK; si esos ficheros desaparecen, vuelven a
     // salir vacios.
-    // El modulo "wallpaper" nativo no reconoce awww, asi que tiro del
-    // fichero de estado que ya mantiene wall.sh.
-    { "type": "display",      "key": " 󰍹 Pantalla" },
-    { "type": "theme",        "key": " 󰉼 Tema" },
-    { "type": "icons",        "key": " 󰀻 Iconos" },
-    { "type": "font",         "key": "  Fuente" },
-    { "type": "cursor",       "key": " 󰆿 Cursor" },
-    {
-      "type": "command",
-      "key": " 󰸉 Wallpaper",
-      "text": "basename \"$(cat \"$HOME/.cache/current_wallpaper\" 2>/dev/null)\" 2>/dev/null || echo '-'"
-    },
+    { "type": "display",      "key": "Pantalla" },
+    { "type": "theme",        "key": "Tema" },
+    { "type": "icons",        "key": "Iconos" },
+    { "type": "font",         "key": "Fuente GTK" },
+    { "type": "cursor",       "key": "Cursor" },
     "break",
 
-    // ── Multimedia y red ─────────────────────────────────
-    { "type": "player",       "key": " 󰥠 Reproductor" },
-    { "type": "media",        "key": " 󰎈 Sonando" },
-    { "type": "sound",        "key": " 󰕾 Audio" },
-    { "type": "wifi",         "key": " 󰖩 Wifi" },
-    { "type": "localip",      "key": " 󰩠 IP local" },
+    // ── Multimedia ───────────────────────────────────────
+    { "type": "player",       "key": "Reproductor" },
+    { "type": "media",        "key": "Sonando" },
     "break",
 
     {

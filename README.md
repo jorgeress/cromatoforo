@@ -236,23 +236,22 @@ lo que el dibujo sigue al wallpaper).
 |---|---|
 | Celda de kitty (JetBrainsMono 13) | 10,4 × 23,86 px |
 | kitty maximizada en eDP-2 (1888×1002) | **181 columnas × 42 filas** |
-| Bloque de datos de fastfetch | **33 líneas**, hasta ~92 columnas |
+| Bloque de datos de fastfetch | **25 líneas**, ~67 columnas |
 | Relleno del logo | 2 columnas a la izquierda, 4 a la derecha |
 
-De ahí sale el presupuesto: `2 + arte + 4 + 92 ≤ 181`.
+De ahí sale el presupuesto: `2 + arte + 4 + 67 ≤ 181`, o sea hasta 108 columnas
+de arte. Pero conviene no apurarlo:
 
-- **Ancho máximo: ~80 columnas.** Punto dulce entre 40 y 60.
+- **Ancho recomendado: hasta ~90 columnas.** Punto dulce entre 40 y 70.
 - **Alto máximo: ~40 líneas** antes de que la salida no quepa en la ventana.
-  Punto dulce entre 30 y 35, que es lo que equilibra con las 33 líneas de datos.
+  Punto dulce entre 20 y 30, que es lo que equilibra con las 25 líneas de datos.
 
-Dos avisos:
+Por qué no apurar el ancho: las 67 columnas las fija la línea del `CPU`, que es
+constante, pero **la línea `Sonando` varía con el título de la canción** y con un
+título largo se pasa de ahí. El margen es para eso.
 
-- La línea más ancha del bloque es la del módulo `Sonando`, y **su ancho varía con
-  el título de la canción**. Los 92 son una medida concreta, no un techo. Deja
-  margen.
-- Con esta configuración de módulos, el bloque de datos solo ya ocupa 92 columnas.
-  En una kitty a media pantalla (90 columnas) se desborda **aunque no haya logo**.
-  Esta config quiere terminal ancha.
+El arte en braille (`⣿⠿⠛`) cuenta como un carácter por columna, así que el ancho
+en caracteres es directamente el ancho en columnas.
 
 Si algún día prefieres una imagen de verdad en vez de ASCII, kitty soporta el
 protocolo gráfico: sería `"type": "kitty"` y la ruta del PNG en `config.jsonc`.
