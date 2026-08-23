@@ -144,5 +144,7 @@ export MANPAGER='sh -c "col -bx | bat -l man -p"'
 # Colores de pywal en cada terminal nueva
 [ -f "$HOME/.cache/wal/sequences" ] && (cat "$HOME/.cache/wal/sequences" &)
 
+# Prompt: la config la genera pywal desde ~/.config/wal/templates/starship.toml
+export STARSHIP_CONFIG="$HOME/.cache/wal/starship.toml"
 command -v starship >/dev/null && eval "$(starship init "$(basename "$SHELL")")"
 command -v zoxide   >/dev/null && eval "$(zoxide init "$(basename "$SHELL")")"

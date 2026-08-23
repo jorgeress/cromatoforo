@@ -34,6 +34,16 @@ pkill -SIGUSR2 waybar || waybar & disown        # waybar recarga estilos
 swaync-client --reload-css || true              # centro de notificaciones
 pkill -SIGUSR1 kitty || true                    # kitty relee colores en caliente
 
+# Consumidores que NO necesitan recarga explicita aqui:
+#   starship  -> STARSHIP_CONFIG apunta a ~/.cache/wal/starship.toml y starship
+#                relee el fichero en cada prompt, asi que entra solo.
+#   btop      -> ~/.config/btop/themes/pywal.theme es un enlace al cache;
+#                coge el tema nuevo al arrancar.
+#   cava      -> ~/.config/cava/config es un enlace al cache. cava solo recarga
+#                con la tecla 'c' (colores) o 'r'; no acepta senales, y mandarle
+#                SIGUSR1 lo mataria.
+#   wlogout   -> lee su CSS al lanzarse.
+
 # 4. Colores en terminales ya abiertas
 for tty in /dev/pts/*; do
     [ -w "$tty" ] && cat "${HOME}/.cache/wal/sequences" > "$tty" 2>/dev/null || true
