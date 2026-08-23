@@ -514,13 +514,33 @@ que fijarlo, usar las rutas de `ls -l /dev/dri/by-path`, nunca `cardN`.
 
 ## Lo que no se versiona
 
+Las reglas están en `~/.dotfiles/info/exclude`. Con
+`status.showUntrackedFiles=no` esas reglas no cambian lo que ves en `dot status`,
+pero **sí protegen de un `dot add -A` descuidado**, que es justo cuando se cuela
+algo que no debe.
+
 | Qué | Por qué |
 |---|---|
+| `~/.ssh/`, `~/.gnupg/`, `.config/gh/hosts.yml` | **credenciales**. `hosts.yml` guarda el token de GitHub en claro |
+| `.config/obs-studio/plugin_config/obs-websocket/` | puede llevar la contraseña del websocket |
+| `~/.claude/`, `.claude.json` | estado de la herramienta, y puede incluir historial |
 | `~/.cache/wal/` | generado. Se reconstruye con `wal` |
 | `~/Pictures/wallpapers/` | binarios pesados |
 | `*.bak`, `*.disabled` | copias de seguridad de trabajo |
 | Ajustes de `gsettings` | viven en dconf, que es binario. Los reaplica `gtk-apply` |
 | `~/.config/fastfetch/logos/*` | el arte es cosa tuya. Solo se versiona la carpeta |
+| discord, spotify, zen, GIMP, Code - OSS | estado de aplicación, no configuración |
+| `.config/Blackmagic Design/`, `.config/Unknown Organization/` | configuración de DaVinci Resolve. **No se toca** (ver [trampas](#trampas-y-hallazgos)) |
+
+**OBS Studio** está sin versionar a propósito: ahora mismo su configuración son
+los valores por defecto (perfil y colección de escenas «Untitled»). Cuando tengas
+escenas de verdad, merece la pena añadir `global.ini`, `user.ini` y
+`basic/scenes/` — pero nunca `plugin_config/obs-websocket/`.
+
+**Qt está sin configurar.** `QT_QPA_PLATFORMTHEME=qt6ct` está puesto en
+`hyprland.lua`, pero no existen ni `~/.config/qt6ct` ni `~/.config/Kvantum`, así
+que las aplicaciones Qt van con su aspecto por defecto y no siguen la paleta. Es
+el equivalente Qt del agujero que tenía GTK.
 
 ---
 

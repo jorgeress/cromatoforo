@@ -159,6 +159,11 @@ hl.config({
     misc = {
         force_default_wallpaper = 0,
         disable_hyprland_logo   = true,
+        -- Si hyprlock muere con el lock cogido, Hyprland deja la pantalla
+        -- roja de "lockscreen crashed". Con esto en true puedes RECUPERAR
+        -- lanzando otro hyprlock encima (hyprctl -i N dispatch exec hyprlock)
+        -- en vez de depender solo de hl.clear_crashed_lockscreen().
+        allow_session_lock_restore = true,
     },
 
 

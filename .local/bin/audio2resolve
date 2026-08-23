@@ -1,0 +1,124 @@
+#!/usr/bin/env bash
+# audio2resolve — convierte audios (m4a, mp3, opus, aac...) a WAV PCM que
+# DaVinci Resolve en Linux importa sin problemas.
+#
+# Uso:
+#   audio2resolve archivo.m4a [otro.mp3 ...]
+#   audio2resolve carpeta/            # convierte todo el audio de la carpeta
+#   audio2resolve algo.zip            # descomprime y convierte lo que haya dentro
+#
+# Opciones:
+#   -o DIR    carpeta de salida (por defecto: ./wav_resolve junto a la entrada)
+#   -b 16|24|32   profundidad de bits (por defecto 24)
+#   -r HZ     frecuencia de muestreo (por defecto: la original)
+#   -s        forzar estéreo (por defecto conserva los canales originales)
+#   -n        normalizar a -16 LUFS (loudnorm, útil para voz)
+#   -f        sobrescribir si ya existe el WAV
+#   -h        esta ayuda
+
+set -euo pipefail
+
+BITS=24
+RATE=""
+OUTDIR=""
+STEREO=0
+NORM=0
+FORCE=0
+
+usage() { sed -n '2,20p' "$0" | sed 's/^# \{0,1\}//'; exit "${1:-0}"; }
+
+while getopts "o:b:r:snfh" opt; do
+  case "$opt" in
+    o) OUTDIR="$OPTARG" ;;
+    b) BITS="$OPTARG" ;;
+    r) RATE="$OPTARG" ;;
+    s) STEREO=1 ;;
+    n) NORM=1 ;;
+    f) FORCE=1 ;;
+    h) usage 0 ;;
+    *) usage 1 ;;
+  esac
+done
+shift $((OPTIND - 1))
+
+[ $# -eq 0 ] && usage 1
+command -v ffmpeg >/dev/null || { echo "Falta ffmpeg" >&2; exit 1; }
+
+case "$BITS" in
+  16) CODEC=pcm_s16le ;;
+  24) CODEC=pcm_s24le ;;
+  32) CODEC=pcm_s32le ;;
+  *)  echo "Bits debe ser 16, 24 o 32" >&2; exit 1 ;;
+esac
+
+EXTS="m4a mp3 aac opus ogg oga wma flac wav aiff aif mp4 mov mkv webm"
+is_audio() {
+  local e="${1##*.}"
+  e="$(printf '%s' "$e" | tr 'A-Z' 'a-z')"
+  case " $EXTS " in *" $e "*) return 0 ;; *) return 1 ;; esac
+}
+
+TMPDIRS=()
+cleanup() { for d in "${TMPDIRS[@]:-}"; do [ -n "$d" ] && rm -rf "$d"; done; }
+trap cleanup EXIT
+
+FILES=()
+DEFAULT_OUT=""
+
+add_dir() {
+  local dir="$1"
+  while IFS= read -r -d '' f; do
+    is_audio "$f" && FILES+=("$f")
+  done < <(find "$dir" -maxdepth 1 -type f -print0 | sort -z)
+}
+
+for arg in "$@"; do
+  if [ -d "$arg" ]; then
+    [ -z "$DEFAULT_OUT" ] && DEFAULT_OUT="${arg%/}/wav_resolve"
+    add_dir "$arg"
+  elif [ -f "$arg" ] && [ "${arg##*.}" = "zip" -o "${arg##*.}" = "ZIP" ]; then
+    tmp="$(mktemp -d)"; TMPDIRS+=("$tmp")
+    unzip -o -q -j "$arg" -d "$tmp"
+    [ -z "$DEFAULT_OUT" ] && DEFAULT_OUT="$(dirname "$arg")/wav_resolve"
+    add_dir "$tmp"
+  elif [ -f "$arg" ]; then
+    [ -z "$DEFAULT_OUT" ] && DEFAULT_OUT="$(dirname "$arg")/wav_resolve"
+    FILES+=("$arg")
+  else
+    echo "No existe: $arg" >&2; exit 1
+  fi
+done
+
+[ ${#FILES[@]} -eq 0 ] && { echo "No se encontraron audios que convertir." >&2; exit 1; }
+
+OUTDIR="${OUTDIR:-$DEFAULT_OUT}"
+mkdir -p "$OUTDIR"
+
+ok=0; skip=0; fail=0
+for f in "${FILES[@]}"; do
+  base="$(basename "$f")"
+  out="$OUTDIR/${base%.*}.wav"
+
+  if [ -e "$out" ] && [ "$FORCE" -eq 0 ]; then
+    echo "· ya existe, se omite: $(basename "$out")  (usa -f para rehacerlo)"
+    skip=$((skip + 1)); continue
+  fi
+
+  args=(-hide_banner -loglevel error -y -i "$f" -vn -map a:0 -c:a "$CODEC")
+  [ -n "$RATE" ] && args+=(-ar "$RATE")
+  [ "$STEREO" -eq 1 ] && args+=(-ac 2)
+  [ "$NORM" -eq 1 ] && args+=(-af "loudnorm=I=-16:TP=-1.5:LRA=11")
+  args+=(-rf64 auto "$out")
+
+  if ffmpeg "${args[@]}"; then
+    printf '✓ %s → %s\n' "$base" "$(basename "$out")"
+    ok=$((ok + 1))
+  else
+    echo "✗ falló: $base" >&2
+    fail=$((fail + 1))
+  fi
+done
+
+echo
+echo "Listo: $ok convertidos, $skip omitidos, $fail fallidos"
+echo "Carpeta: $OUTDIR"
