@@ -253,6 +253,34 @@ título largo se pasa de ahí. El margen es para eso.
 El arte en braille (`⣿⠿⠛`) cuenta como un carácter por columna, así que el ancho
 en caracteres es directamente el ancho en columnas.
 
+**Centrado automático.** La función mide el dibujo y el bloque de datos en cada
+ejecución y calcula dos rellenos:
+
+- `--logo-padding-left` para que el conjunto quede **centrado horizontalmente** en
+  la ventana, sea cual sea el ancho del dibujo.
+- `--logo-padding-top` para **centrar el dibujo verticalmente** respecto a los
+  datos, cuando el dibujo es más bajo.
+
+Si el dibujo es **más alto** que el bloque de datos se queda alineado arriba y
+continúa por debajo. No es un descuido: fastfetch no tiene relleno vertical para
+el lado de los módulos, y `--structure` permitiría anteponer líneas en blanco pero
+**descarta las claves definidas en el JSON** (saldría `Host` en vez de `Equipo`).
+Si quieres un dibujo alto perfectamente centrado, recórtalo a 25 líneas o menos.
+
+Medir el bloque cuesta una ejecución extra de fastfetch, unos 50 ms. Es
+imperceptible y evita tener números cableados que se quedan obsoletos en cuanto
+tocas los módulos.
+
+**Previsualizar uno concreto** sin esperar a que salga por sorteo:
+
+```bash
+FF_LOGO=flor.txt fastfetch
+```
+
+Si pasas tú un `--logo`, `--file` o similar, la función se aparta y llama a
+fastfetch directamente: calcular los rellenos con el dibujo sorteado mientras se
+muestra otro daría un montaje descuadrado.
+
 Si algún día prefieres una imagen de verdad en vez de ASCII, kitty soporta el
 protocolo gráfico: sería `"type": "kitty"` y la ruta del PNG en `config.jsonc`.
 
