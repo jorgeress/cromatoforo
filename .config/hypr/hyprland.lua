@@ -295,7 +295,7 @@ hl.bind(M .. " + SHIFT + C", hl.dsp.exec_cmd("hyprpicker -a"))
 hl.bind(M .. " + Y", hl.dsp.exec_cmd("cliphist list | wofi --dmenu | cliphist decode | wl-copy"))
 
 -- Bloqueo / salida
-hl.bind(M .. " + CTRL + L", hl.dsp.exec_cmd("hyprlock"))
+hl.bind(M .. " + CTRL + L", hl.dsp.exec_cmd("hyprlock --grace 2"))
 hl.bind(M .. " + CTRL + Q", hl.dsp.exec_cmd("wlogout -b 3 -T 300 -B 300 -L 200 -R 200"))
 
 -- Wallpaper: cambia imagen Y repinta toda la paleta del sistema

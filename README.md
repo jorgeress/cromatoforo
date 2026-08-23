@@ -26,6 +26,7 @@ eDP-2 de 1920x1080 a 144 Hz, escala 1.
   - [btop y cava](#btop-y-cava)
   - [GTK](#gtk)
   - [wlogout y swaync](#wlogout-y-swaync)
+  - [hyprlock](#hyprlock)
 - [Trampas y hallazgos](#trampas-y-hallazgos)
 - [Lo que no se versiona](#lo-que-no-se-versiona)
 - [Dependencias](#dependencias)
@@ -121,7 +122,9 @@ pérdida con `dot checkout -f`.
 │   ├── hypridle.conf         apagado de pantalla e idle
 │   └── scripts/
 │       ├── wall.sh           cambia fondo + repinta todo el sistema
-│       └── wallpicker.sh     selector visual de fondos (wofi con miniaturas)
+│       ├── wallpicker.sh     selector visual de fondos (wofi con miniaturas)
+│       ├── lock-battery.sh   linea de bateria para hyprlock
+│       └── lock-media.sh     linea de reproduccion para hyprlock
 ├── waybar/                   barra: config.jsonc + style.css
 ├── wofi/                     lanzador: config + style.css
 ├── kitty/                    terminal
@@ -336,6 +339,30 @@ Iconos y cursor son Adwaita porque es lo único instalado. Si instalas algo como
   aspecto. Tras tocar el CSS, `swaync-client --reload-css` responde con
   `success: true` o con el error de parseo, que va bien para validar.
 
+### hyprlock
+
+`hyprlock.conf` usa **hyprlang, no Lua**, y toma los colores de
+`~/.cache/wal/colors-hyprlock.conf`.
+
+Lleva reloj, fecha, saludo, campo de contraseña, y tres cosas mas:
+
+- **Avatar.** Deja una imagen cuadrada (PNG o JPG) en `~/.face`. Si el fichero no
+  existe, hyprlock simplemente no dibuja el circulo y sigue funcionando con
+  normalidad: no hay que tocar la config para quitarlo ni para ponerlo. El tamano
+  y el borde se ajustan en el bloque `image`.
+- **Bateria**, arriba a la derecha, via `lock-battery.sh`. Sale vacia si el equipo
+  no tiene bateria.
+- **Reproduccion**, abajo al centro, via `lock-media.sh`. Sale vacia si no hay
+  nada sonando, para no dejar una linea huerfana.
+
+Los dos scripts se pueden ejecutar sueltos en un terminal para ver que devuelven,
+que es la forma comoda de probarlos sin bloquear la pantalla.
+
+> Para probar cambios en el bloqueo sin quedarte fuera: lanza
+> `hyprlock --grace 300` y cierra el proceso con `pkill hyprlock` desde otra
+> parte. El `grace` alto es la red de seguridad, porque durante esos segundos
+> cualquier tecla lo descarta sin contrasena.
+
 ---
 
 ## Trampas y hallazgos
@@ -415,6 +442,27 @@ nombre `#353535`, el gris de fábrica.
 > Al verificar esto, **cuidado con dónde mides**: la vista de ficheros de Thunar
 > tiene su propio fondo, distinto del de la ventana. Medir ahí lleva a concluir
 > que el `@import` está roto cuando no lo está.
+
+### hyprlock: `grace` y `no_fade_in` no son opciones de config
+
+En hyprlock 0.9.6 no existen dentro del bloque `general`. Ponerlas ahi da
+`config option <general:grace> does not exist` y **se ignoran en silencio** salvo
+que mires el log. Son flags de linea de comandos:
+
+```bash
+hyprlock --grace 2 --no-fade-in
+```
+
+Por eso los tres sitios que lanzan hyprlock (el bind `SUPER+CTRL+L`, `hypridle` y
+el boton de wlogout) pasan `--grace 2`.
+
+### playerctl con varios reproductores mezcla la informacion
+
+Con Spotify y un navegador abiertos a la vez, `playerctl status` puede responder
+por un reproductor y `playerctl metadata` por otro: acabas mostrando el estado de
+uno con la cancion del otro. Hay que elegir **un** reproductor y preguntarle todo
+a el, que es lo que hace `lock-media.sh` (prioriza el que este sonando, y si
+ninguno suena coge el primero pausado).
 
 ### fastfetch 2.67 quitó `--logo-source`
 

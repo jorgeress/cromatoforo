@@ -1,6 +1,6 @@
 {
     "label" : "lock",
-    "action" : "hyprlock",
+    "action" : "hyprlock --grace 2",
     "text" : "  Bloquear",
     "keybind" : "l"
 }
