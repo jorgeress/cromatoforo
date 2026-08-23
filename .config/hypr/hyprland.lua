@@ -44,7 +44,7 @@ hl.monitor({ output = "", mode = "preferred", position = "auto", scale = "auto" 
 local terminal    = "kitty"
 local fileManager = "thunar"
 local menu        = "wofi --show drun"
-local browser     = "firefox"
+local browser     = "zen-browser"
 
 ---------------------------------------------------------------
 ---- VARIABLES DE ENTORNO -------------------------------------
