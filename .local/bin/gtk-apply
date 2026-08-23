@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# gtk-apply — reaplica los ajustes GTK que viven en dconf.
+#
+# Los ficheros ~/.config/gtk-3.0|4.0/{settings.ini,gtk.css} si estan en el
+# repo de dotfiles, pero estos valores los guarda dconf en un binario que no
+# se versiona. Ejecutar esto tras un despliegue limpio.
+#
+# El tema tiene que ser "Adwaita" a secas: "Adwaita-dark" NO es un nombre de
+# tema valido en GTK3 y hace que caiga al claro por defecto. La variante
+# oscura se pide con prefer-dark / color-scheme.
+set -euo pipefail
+
+I=org.gnome.desktop.interface
+gsettings set $I gtk-theme     "Adwaita"
+gsettings set $I color-scheme  "prefer-dark"
+gsettings set $I icon-theme    "Adwaita"
+gsettings set $I cursor-theme  "Adwaita"
+gsettings set $I cursor-size   24
+gsettings set $I font-name     "JetBrainsMono Nerd Font 11"
+
+echo "Ajustes GTK aplicados:"
+for k in gtk-theme color-scheme icon-theme cursor-theme font-name; do
+    printf "  %-14s %s\n" "$k" "$(gsettings get $I $k)"
+done

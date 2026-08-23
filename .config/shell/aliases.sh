@@ -134,6 +134,33 @@ recentpkgs() {
     grep -i installed /var/log/pacman.log | tail -"${1:-25}"
 }
 
+# fastfetch con dot art rotatorio: coge uno al azar de
+# ~/.config/fastfetch/logos/ en cada ejecución. Si la carpeta está vacía,
+# cae al logo fijo que apunta config.jsonc.
+# Si el fichero ya trae códigos ANSI propios usa file-raw, y si no file,
+# que es el que sustituye $1..$9 por la paleta de pywal.
+fastfetch() {
+    local dir="$HOME/.config/fastfetch/logos" logo type
+    logo=$(find "$dir" -maxdepth 1 -type f ! -name '.*' 2>/dev/null | shuf -n1)
+    if [ -z "$logo" ]; then
+        command fastfetch "$@"
+        return
+    fi
+    if grep -qU $'\x1b' "$logo" 2>/dev/null; then type=file-raw; else type=file; fi
+    # Ojo: es --logo FICHERO. En fastfetch 2.67 quitaron --logo-source del CLI.
+    command fastfetch --logo-type "$type" --logo "$logo" "$@"
+}
+
+# Ver todos los dot art de golpe, para elegir cuáles te quedas
+fflogos() {
+    local f
+    for f in "$HOME"/.config/fastfetch/logos/*; do
+        [ -f "$f" ] || continue
+        printf '\n\033[1m── %s ──\033[0m\n' "$(basename "$f")"
+        command fastfetch --logo-type file --logo "$f" --structure title
+    done
+}
+
 # ─────────────────────────────────────────────────────────────
 #  ARRANQUE
 # ─────────────────────────────────────────────────────────────

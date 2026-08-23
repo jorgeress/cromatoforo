@@ -1,12 +1,13 @@
-$7   ┌──────────────────────────────┐
-$7   │                              │
-$8   │   Pega aqui tu ASCII de la   │
-$8   │   j estilo L de Death Note   │
-$7   │                              │
-$8   │   Hasta ~26 lineas de alto   │
-$8   │   y ~34 columnas de ancho    │
-$7   │                              │
-$8   │   dolar+numero del 1 al 9    │
-$8   │   = color de la paleta       │
-$7   │                              │
-$7   └──────────────────────────────┘
+$7   ┌────────────────────────────────┐
+$7   │                                │
+$8   │  Este es el logo de reserva.    │
+$8   │  Solo sale si la carpeta        │
+$8   │  ~/.config/fastfetch/logos/     │
+$8   │  esta vacia.                    │
+$7   │                                │
+$8   │  Pega ahi tus dot art, uno por  │
+$8   │  fichero. La funcion fastfetch  │
+$8   │  de aliases.sh coge uno al      │
+$8   │  azar en cada ejecucion.        │
+$7   │                                │
+$7   └────────────────────────────────┘

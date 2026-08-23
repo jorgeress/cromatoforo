@@ -1,0 +1,158 @@
+/* GTK4 / libadwaita con la paleta de pywal.
+ *
+ * OJO: en libadwaita 1.9 ni redefinir @define-color window_bg_color ni
+ * declarar las variables --window-bg-color surten efecto; comprobado
+ * midiendo pixeles sobre un dialogo real. Solo entran las reglas
+ * explicitas, asi que es lo que hay aqui.
+ */
+@import url("../../.cache/wal/colors-gtk.css");
+
+window,
+.background,
+dialog,
+.dialog-content,
+alertdialog {
+    background-color: @bg;
+    color: @fg;
+}
+
+headerbar,
+.titlebar,
+.toolbar,
+actionbar,
+searchbar > revealer > box {
+    background-color: @bg;
+    color: @fg;
+    border-color: @border_c;
+}
+
+.navigation-sidebar,
+.sidebar-pane,
+.sidebar {
+    background-color: @bg;
+    color: @fg;
+}
+
+listview,
+columnview,
+gridview,
+textview,
+textview text,
+.view {
+    background-color: mix(@bg, @fg, 0.05);
+    color: @fg;
+}
+
+row,
+.card {
+    background-color: mix(@bg, @fg, 0.07);
+    color: @fg;
+    border-radius: 10px;
+}
+
+row:selected,
+listview > row:selected,
+.view:selected {
+    background-color: @accent;
+    color: @bg;
+}
+
+row:hover {
+    background-color: @accent_soft;
+}
+
+entry,
+.entry,
+spinbutton {
+    background-color: mix(@bg, @fg, 0.09);
+    color: @fg;
+    border: 1px solid @border_c;
+    border-radius: 8px;
+}
+
+entry:focus-within {
+    border-color: @accent;
+}
+
+button {
+    background-image: none;
+    background-color: mix(@bg, @fg, 0.10);
+    color: @fg;
+    border: 1px solid @border_c;
+    border-radius: 8px;
+}
+
+button:hover {
+    background-color: @accent_soft;
+}
+
+button:active,
+button:checked {
+    background-color: @accent;
+    color: @bg;
+}
+
+button.suggested-action {
+    background-color: @accent;
+    color: @bg;
+}
+
+button.destructive-action {
+    background-color: @urgent;
+    color: @bg;
+}
+
+popover > contents,
+popover > arrow,
+.menu,
+tooltip {
+    background-color: @bg_solid;
+    color: @fg;
+    border: 1px solid @border_c;
+    border-radius: 12px;
+}
+
+popover modelbutton:hover {
+    background-color: @accent;
+    color: @bg;
+}
+
+scrollbar {
+    background-color: transparent;
+}
+
+scrollbar > range > trough > slider {
+    background-color: @fg_dim;
+    border-radius: 8px;
+}
+
+scrollbar > range > trough > slider:hover {
+    background-color: @accent;
+}
+
+progressbar > trough > progress,
+levelbar > trough > block.filled,
+scale > trough > highlight {
+    background-color: @accent;
+}
+
+progressbar > trough,
+scale > trough {
+    background-color: mix(@bg, @fg, 0.14);
+}
+
+switch:checked,
+check:checked,
+radio:checked {
+    background-color: @accent;
+    color: @bg;
+}
+
+separator {
+    background-color: @border_c;
+}
+
+label:disabled,
+.dim-label {
+    color: @fg_dim;
+}

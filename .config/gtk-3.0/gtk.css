@@ -1,0 +1,227 @@
+/* GTK3 con la paleta de pywal.
+ *
+ * OJO: redefinir los colores internos de Adwaita (@define-color
+ * theme_bg_color ...) NO funciona en GTK 3.24.52 — Adwaita resuelve sus
+ * propios nombres y se ignora el override. Comprobado midiendo pixeles.
+ * Por eso aqui van reglas explicitas sobre los widgets.
+ *
+ * La paleta sale de ~/.cache/wal/colors-gtk.css, el mismo fichero que
+ * usan waybar, wofi, swaync y wlogout.
+ */
+@import url("../../.cache/wal/colors-gtk.css");
+
+/* ── Superficies principales ───────────────────────────── */
+window,
+.background,
+dialog,
+messagedialog {
+    background-color: @bg;
+    color: @fg;
+}
+
+headerbar,
+.titlebar,
+menubar,
+toolbar,
+.toolbar,
+actionbar {
+    background-color: @bg;
+    color: @fg;
+    border-color: @border_c;
+}
+
+/* ── Barras laterales ──────────────────────────────────── */
+.sidebar,
+placessidebar,
+placessidebar list,
+stacksidebar,
+paned > separator {
+    background-color: @bg;
+    color: @fg;
+}
+
+/* ── Vistas de contenido: un pelo elevadas sobre el fondo ─ */
+treeview.view,
+iconview,
+textview,
+textview text,
+.view,
+scrolledwindow > viewport {
+    background-color: mix(@bg, @fg, 0.05);
+    color: @fg;
+}
+
+treeview.view:selected,
+iconview:selected,
+.view:selected,
+list row:selected,
+row:selected {
+    background-color: @accent;
+    color: @bg;
+}
+
+treeview.view:hover,
+list row:hover,
+row:hover {
+    background-color: @accent_soft;
+}
+
+/* ── Entradas de texto ─────────────────────────────────── */
+entry,
+spinbutton,
+searchbar entry {
+    background-color: mix(@bg, @fg, 0.09);
+    color: @fg;
+    border: 1px solid @border_c;
+    border-radius: 8px;
+}
+
+entry:focus {
+    border-color: @accent;
+}
+
+entry selection {
+    background-color: @accent;
+    color: @bg;
+}
+
+/* ── Botones ───────────────────────────────────────────── */
+button {
+    background-image: none;
+    background-color: mix(@bg, @fg, 0.10);
+    color: @fg;
+    border: 1px solid @border_c;
+    border-radius: 8px;
+    text-shadow: none;
+}
+
+button:hover {
+    background-color: @accent_soft;
+}
+
+button:active,
+button:checked {
+    background-color: @accent;
+    color: @bg;
+}
+
+button:disabled {
+    color: @fg_dim;
+    background-color: @bg;
+}
+
+button.suggested-action {
+    background-color: @accent;
+    color: @bg;
+}
+
+button.destructive-action {
+    background-color: @urgent;
+    color: @bg;
+}
+
+/* ── Menus y popovers ──────────────────────────────────── */
+menu,
+.menu,
+popover,
+popover.background,
+popover > contents {
+    background-color: @bg_solid;
+    color: @fg;
+    border: 1px solid @border_c;
+    border-radius: 12px;
+}
+
+menuitem:hover,
+popover modelbutton:hover {
+    background-color: @accent;
+    color: @bg;
+}
+
+/* ── Pestañas ──────────────────────────────────────────── */
+notebook > header {
+    background-color: @bg;
+    border-color: @border_c;
+}
+
+notebook > header > tabs > tab {
+    color: @fg_dim;
+    background-color: transparent;
+}
+
+notebook > header > tabs > tab:checked {
+    color: @fg;
+    box-shadow: inset 0 -2px @accent;
+}
+
+/* ── Scrollbars ────────────────────────────────────────── */
+scrollbar {
+    background-color: @bg;
+    border: none;
+}
+
+scrollbar slider {
+    background-color: @fg_dim;
+    border-radius: 8px;
+    min-width: 8px;
+    min-height: 8px;
+}
+
+scrollbar slider:hover {
+    background-color: @accent;
+}
+
+/* ── Progreso y controles ──────────────────────────────── */
+progressbar progress,
+levelbar block.filled {
+    background-color: @accent;
+}
+
+progressbar trough,
+levelbar block.empty,
+scale trough {
+    background-color: mix(@bg, @fg, 0.14);
+}
+
+scale highlight {
+    background-color: @accent;
+}
+
+switch:checked {
+    background-color: @accent;
+}
+
+check:checked,
+radio:checked {
+    background-color: @accent;
+    border-color: @accent;
+    color: @bg;
+}
+
+/* ── Varios ────────────────────────────────────────────── */
+tooltip,
+tooltip.background {
+    background-color: @bg_solid;
+    color: @fg;
+    border: 1px solid @border_c;
+    border-radius: 8px;
+}
+
+separator {
+    background-color: @border_c;
+}
+
+statusbar,
+infobar {
+    background-color: @bg;
+    color: @fg;
+}
+
+label:disabled,
+.dim-label {
+    color: @fg_dim;
+}
+
+*:link {
+    color: @accent2;
+}
