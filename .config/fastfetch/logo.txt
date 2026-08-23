@@ -1,0 +1,12 @@
+$7   ┌──────────────────────────────┐
+$7   │                              │
+$8   │   Pega aqui tu ASCII de la   │
+$8   │   j estilo L de Death Note   │
+$7   │                              │
+$8   │   Hasta ~26 lineas de alto   │
+$8   │   y ~34 columnas de ancho    │
+$7   │                              │
+$8   │   dolar+numero del 1 al 9    │
+$8   │   = color de la paleta       │
+$7   │                              │
+$7   └──────────────────────────────┘
