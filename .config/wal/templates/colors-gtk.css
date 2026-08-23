@@ -1,0 +1,15 @@
+/* Autogenerado por pywal. NO editar a mano. */
+@define-color bg        {color0};
+@define-color bg_alt    {color8};
+@define-color fg        {color7};
+@define-color fg_dim    {color8};
+@define-color accent    {color4};
+@define-color accent2   {color6};
+@define-color warn      {color3};
+@define-color urgent    {color1};
+@define-color good      {color2};
+
+@define-color bg_rgb    rgba({color0.rgb}, 0.75);
+@define-color bg_solid  rgba({color0.rgb}, 0.95);
+@define-color accent_soft rgba({color4.rgb}, 0.20);
+@define-color border_c  rgba({color4.rgb}, 0.45);

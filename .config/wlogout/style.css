@@ -1,0 +1,39 @@
+/* wlogout — paleta de pywal (no hardcodear hex aqui) */
+@import url("../../.cache/wal/colors-gtk.css");
+
+* {
+    font-family: "JetBrainsMono Nerd Font", monospace;
+    font-size: 20px;
+    font-weight: 600;
+    background-image: none;   /* fuera los PNG por defecto, usamos glifos */
+    box-shadow: none;
+    transition: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+window {
+    background-color: alpha(@bg, 0.55);
+}
+
+button {
+    color: @fg;
+    background-color: @bg_rgb;
+    border: 2px solid @border_c;
+    border-radius: 18px;
+    margin: 10px;
+    padding: 0;
+    outline: none;
+}
+
+button:focus,
+button:hover {
+    color: @bg;
+    background-color: @accent;
+    border: 2px solid @accent2;
+}
+
+/* El de apagar avisa un poco mas */
+#shutdown:focus,
+#shutdown:hover {
+    background-color: @warn;
+    border: 2px solid @warn;
+}

@@ -1,0 +1,186 @@
+/* swaync — paleta de pywal (no hardcodear hex aqui) */
+@import url("../../.cache/wal/colors-gtk.css");
+
+* {
+    font-family: "JetBrainsMono Nerd Font", sans-serif;
+    font-size: 14px;
+    background: none;
+    box-shadow: none;
+    transition: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Popups sueltos ─────────────────────────────── */
+.notification-row {
+    outline: none;
+}
+
+.notification {
+    background: @bg_rgb;
+    border: 1px solid @border_c;
+    border-radius: 16px;
+    margin: 6px 8px;
+    padding: 0;
+}
+
+.notification:hover {
+    border: 1px solid @accent;
+}
+
+.notification-content {
+    padding: 10px 12px;
+    color: @fg;
+}
+
+.summary {
+    color: @fg;
+    font-weight: 700;
+    font-size: 15px;
+}
+
+.time {
+    color: @fg_dim;
+    font-size: 12px;
+}
+
+.body {
+    color: @fg;
+}
+
+.notification.critical {
+    border: 1px solid @warn;
+}
+
+.notification.low {
+    border: 1px solid @border_c;
+}
+
+/* Boton de cerrar de cada notificacion */
+.close-button {
+    background: transparent;
+    color: @fg_dim;
+    border-radius: 10px;
+    margin: 6px;
+    padding: 2px 6px;
+}
+
+.close-button:hover {
+    background: @warn;
+    color: @bg;
+}
+
+.notification-action,
+.inline-reply-button {
+    background: @accent_soft;
+    color: @fg;
+    border: 1px solid @border_c;
+    border-radius: 10px;
+    margin: 4px;
+    padding: 4px 10px;
+}
+
+.notification-action:hover,
+.inline-reply-button:hover {
+    background: @accent;
+    color: @bg;
+}
+
+.inline-reply-entry {
+    background: @bg_solid;
+    color: @fg;
+    border: 1px solid @border_c;
+    border-radius: 10px;
+    padding: 4px 8px;
+}
+
+/* ── Centro de control ──────────────────────────── */
+.control-center {
+    background: @bg_rgb;
+    border: 2px solid @border_c;
+    border-radius: 20px;
+    padding: 12px;
+}
+
+.control-center-list {
+    background: transparent;
+}
+
+.control-center .notification {
+    background: alpha(@bg_alt, 0.25);
+}
+
+.widget-title {
+    color: @fg;
+    font-size: 17px;
+    font-weight: 700;
+    margin: 4px 8px 12px 8px;
+}
+
+.widget-title > button {
+    background: @accent_soft;
+    color: @fg;
+    border: 1px solid @border_c;
+    border-radius: 12px;
+    padding: 4px 12px;
+    font-size: 13px;
+}
+
+.widget-title > button:hover {
+    background: @accent;
+    color: @bg;
+}
+
+.widget-dnd {
+    color: @fg;
+    margin: 4px 8px 12px 8px;
+    font-size: 15px;
+}
+
+.widget-dnd > switch {
+    background: @bg_solid;
+    border: 1px solid @border_c;
+    border-radius: 14px;
+}
+
+.widget-dnd > switch:checked {
+    background: @accent;
+}
+
+.widget-dnd > switch slider {
+    background: @fg;
+    border-radius: 12px;
+}
+
+/* Reproduccion */
+.widget-mpris {
+    background: alpha(@bg_alt, 0.25);
+    border: 1px solid @border_c;
+    border-radius: 16px;
+    padding: 10px;
+    margin: 4px 8px 12px 8px;
+}
+
+.widget-mpris-player {
+    background: transparent;
+    color: @fg;
+}
+
+.widget-mpris-title {
+    color: @fg;
+    font-weight: 700;
+    font-size: 15px;
+}
+
+.widget-mpris-subtitle {
+    color: @fg_dim;
+    font-size: 13px;
+}
+
+.widget-mpris button:hover {
+    background: @accent_soft;
+    border-radius: 10px;
+}
+
+/* Aviso de bandeja vacia */
+.blank-window {
+    background: transparent;
+}

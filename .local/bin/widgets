@@ -1,0 +1,119 @@
+#!/usr/bin/env bash
+# widgets — lanza y consulta el eye candy del escritorio.
+# widgets          → panel en scratchpad con pipes, fastfetch, btop y matrix
+# widgets -h       → ayuda y estado de cada programa
+# widgets <nombre> → lanza uno suelto en el scratchpad
+
+WIDGET_CLASS="kitty-widget"
+
+# nombre|comando|descripción
+WIDGETS=(
+    "pipes|pipes.sh -t 1 -f 60|Tuberías serpenteantes. -t 0..5 cambia el estilo."
+    "matrix|unimatrix -s 96 -l o|Lluvia estilo Matrix. -c cambia el color."
+    "cava|cava|Visualizador de audio. Solo se mueve si suena algo."
+    "btop|btop|Monitor de CPU, RAM, red y procesos."
+    "fastfetch|fastfetch --logo-type kitty|Specs del sistema con logo."
+    "bonsai|cbonsai -l -i -w 2|Bonsái que crece infinitamente."
+    "acuario|asciiquarium|Acuario animado en ASCII."
+    "clock|tty-clock -c -C 4 -s|Reloj gigante centrado con segundos."
+)
+
+show_help() {
+    echo
+    echo "  widgets — eye candy para el escritorio"
+    echo
+    printf "  \033[1m%-11s %-11s %s\033[0m\n" "NOMBRE" "ESTADO" "DESCRIPCIÓN"
+    echo "  ─────────────────────────────────────────────────────────────────────"
+    for w in "${WIDGETS[@]}"; do
+        IFS='|' read -r name cmd desc <<< "$w"
+        bin="${cmd%% *}"
+        if command -v "$bin" >/dev/null 2>&1; then
+            estado=$'\033[32m✓ ok\033[0m       '
+        else
+            estado=$'\033[31m✗ falta\033[0m    '
+        fi
+        printf "  %-11s %b %s\n" "$name" "$estado" "$desc"
+    done
+    echo
+    echo "  USO"
+    echo "    widgets              panel completo (pipes + fastfetch + btop + matrix)"
+    echo "    widgets <nombre>     lanza uno solo"
+    echo "    widgets -l           solo la lista, sin ayuda"
+    echo "    widgets -k           cierra todos los widgets abiertos"
+    echo "    widgets -i           instala los que falten"
+    echo
+    echo "  Todo se abre en el scratchpad: SUPER+S para mostrar/ocultar."
+    echo
+}
+
+launch() {
+    local name="$1"
+    for w in "${WIDGETS[@]}"; do
+        IFS='|' read -r n cmd desc <<< "$w"
+        if [ "$n" = "$name" ]; then
+            bin="${cmd%% *}"
+            if ! command -v "$bin" >/dev/null 2>&1; then
+                echo "  ✗ '$bin' no está instalado.  Ejecuta: widgets -i"
+                return 1
+            fi
+            kitty --class "$WIDGET_CLASS" -e bash -c "$cmd" &
+            sleep 0.4
+            hyprctl dispatch "hl.dsp.window.move({ workspace = \"special:magic\", window = \"class:^($WIDGET_CLASS)$\" })" >/dev/null
+            return 0
+        fi
+    done
+    echo "  ✗ Widget desconocido: $name"
+    echo "    Ver disponibles: widgets -l"
+    return 1
+}
+
+case "${1:-panel}" in
+    -h|--help|help)
+        show_help
+        ;;
+
+    -l|--list)
+        for w in "${WIDGETS[@]}"; do
+            IFS='|' read -r name cmd desc <<< "$w"
+            bin="${cmd%% *}"
+            command -v "$bin" >/dev/null 2>&1 \
+                && printf "  \033[32m✓\033[0m %-11s %s\n" "$name" "$desc" \
+                || printf "  \033[31m✗\033[0m %-11s %s\n" "$name" "$desc"
+        done
+        ;;
+
+    -k|--kill)
+        pkill -f "class $WIDGET_CLASS" 2>/dev/null
+        hyprctl clients -j | grep -q "$WIDGET_CLASS" && \
+            hyprctl dispatch closewindow "class:^($WIDGET_CLASS)$" >/dev/null
+        echo "  Widgets cerrados."
+        ;;
+
+    -i|--install)
+        faltan=()
+        for w in "${WIDGETS[@]}"; do
+            IFS='|' read -r name cmd desc <<< "$w"
+            bin="${cmd%% *}"
+            command -v "$bin" >/dev/null 2>&1 || faltan+=("$bin")
+        done
+        if [ ${#faltan[@]} -eq 0 ]; then
+            echo "  Todo instalado."
+        else
+            echo "  Faltan: ${faltan[*]}"
+            echo "  Ejecutando: paru -S ${faltan[*]}"
+            paru -S "${faltan[@]}"
+        fi
+        ;;
+
+    panel)
+        echo "  Abriendo panel en el scratchpad..."
+        for w in pipes clock matrix; do
+            launch "$w"
+        done
+        echo "  Listo. SUPER+S para mostrar/ocultar."
+        ;;
+
+    *)
+        launch "$1"
+        ;;
+esac

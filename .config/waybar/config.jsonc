@@ -1,0 +1,89 @@
+{
+  "layer": "top",
+  "position": "top",
+  "height": 38,
+  "spacing": 6,
+  "margin-top": 8,
+  "margin-left": 12,
+  "margin-right": 12,
+
+  "modules-left":   ["hyprland/workspaces", "hyprland/submap", "hyprland/window"],
+  "modules-center": ["clock"],
+  "modules-right":  ["tray", "custom/notification", "backlight", "pulseaudio",
+                     "network", "cpu", "memory", "temperature", "battery", "custom/power"],
+
+  "hyprland/workspaces": {
+    "format": "{icon}",
+    "on-click": "activate",
+    "format-icons": {
+      "1": "1", "2": "2", "3": "3", "4": "4", "5": "5",
+      "6": "6", "7": "7", "8": "8", "9": "9", "10": "0",
+      "urgent": "", "default": "", "active": ""
+    },
+    "persistent-workspaces": { "*": 5 }
+  },
+
+  "hyprland/window": { "format": "{title}", "max-length": 45, "separate-outputs": true },
+
+  "clock": {
+    "format": "  {:%H:%M}",
+    "format-alt": "  {:%a %d %b %Y}",
+    "tooltip-format": "<tt>{calendar}</tt>",
+    "calendar": {
+      "mode": "month",
+      "format": {
+        "today": "<span color='#ffffff'><b>{}</b></span>"
+      }
+    }
+  },
+
+  "cpu":    { "format": "  {usage}%", "interval": 3, "on-click": "kitty -e btop" },
+  "memory": { "format": "  {percentage}%", "interval": 5, "tooltip-format": "{used:0.1f}G / {total:0.1f}G" },
+
+  "temperature": {
+    "critical-threshold": 82,
+    "format": "{icon} {temperatureC}°C",
+    "format-icons": ["", "", ""]
+  },
+
+  "backlight": { "format": "{icon} {percent}%", "format-icons": ["", "", "", ""], "on-scroll-up": "brightnessctl set 5%+", "on-scroll-down": "brightnessctl set 5%-" },
+
+  "battery": {
+    "states": { "warning": 25, "critical": 12 },
+    "format": "{icon} {capacity}%",
+    "format-charging": "  {capacity}%",
+    "format-icons": ["", "", "", "", ""],
+    "tooltip-format": "{timeTo} · {power}W"
+  },
+
+  "network": {
+    "format-wifi": "  {signalStrength}%",
+    "format-ethernet": "  {ipaddr}",
+    "format-disconnected": "  sin red",
+    "tooltip-format-wifi": "{essid} · {ipaddr}",
+    "on-click": "kitty -e nmtui"
+  },
+
+  "pulseaudio": {
+    "format": "{icon}  {volume}%",
+    "format-muted": "  muted",
+    "format-icons": { "headphone": "", "default": ["", "", ""] },
+    "on-click": "pavucontrol",
+    "on-click-right": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
+    "scroll-step": 5
+  },
+
+  "custom/notification": {
+    "tooltip": false,
+    "format": "{icon}",
+    "format-icons": { "notification": "<span foreground='red'><sup></sup></span>", "none": "", "dnd-notification": "<span foreground='red'><sup></sup></span>", "dnd-none": "" },
+    "return-type": "json",
+    "exec": "swaync-client -swb",
+    "on-click": "swaync-client -t -sw",
+    "escape": true
+  },
+
+  "custom/power": { "format": "⏻", "tooltip": false, "on-click": "wlogout -b 3 -T 300 -B 300 -L 200 -R 200" },
+
+  "tray": { "icon-size": 16, "spacing": 8 }
+}

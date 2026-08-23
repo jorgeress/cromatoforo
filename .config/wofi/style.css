@@ -1,0 +1,64 @@
+@import url("../../.cache/wal/colors-gtk.css");
+
+* {
+    font-family: "JetBrainsMono Nerd Font", monospace;
+    font-size: 14px;
+}
+
+window {
+    background-color: @bg_rgb;
+    border: 2px solid @accent;
+    border-radius: 18px;
+}
+
+#outer-box {
+    padding: 18px;
+}
+
+#input {
+    background-color: alpha(@bg_alt, 0.5);
+    color: @fg;
+    border: 1px solid @border_c;
+    border-radius: 12px;
+    padding: 10px 14px;
+    margin-bottom: 14px;
+}
+
+#input:focus {
+    border: 1px solid @accent;
+}
+
+#scroll {
+    margin: 0;
+}
+
+#inner-box {
+    background-color: transparent;
+}
+
+#entry {
+    padding: 9px 12px;
+    border-radius: 12px;
+    margin: 2px 0;
+}
+
+#entry:selected {
+    background-color: @accent;
+}
+
+#entry:selected #text {
+    color: @bg;
+    font-weight: bold;
+}
+
+#text {
+    color: @fg;
+}
+
+#text:selected {
+    color: @bg;
+}
+
+#img {
+    margin-right: 12px;
+}

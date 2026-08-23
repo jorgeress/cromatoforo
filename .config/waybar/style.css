@@ -1,0 +1,148 @@
+/* Colores generados por pywal */
+@import url("../../.cache/wal/colors-gtk.css");
+
+* {
+    font-family: "JetBrainsMono Nerd Font", sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    border: none;
+    border-radius: 0;
+    min-height: 0;
+    transition: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+window#waybar {
+    background: transparent;
+    color: @fg;
+}
+
+/* Cada grupo es una isla flotante */
+#workspaces,
+#window,
+#clock,
+#tray,
+#custom-notification,
+#backlight,
+#pulseaudio,
+#network,
+#cpu,
+#memory,
+#temperature,
+#battery,
+#custom-power {
+    background: @bg_rgb;
+    border: 1px solid @border_c;
+    border-radius: 14px;
+    padding: 2px 12px;
+    margin: 2px 0;
+}
+
+/* ── Workspaces ─────────────────────────────────── */
+#workspaces {
+    padding: 2px 6px;
+}
+
+#workspaces button {
+    color: @fg_dim;
+    background: transparent;
+    border-radius: 10px;
+    padding: 0 8px;
+    margin: 2px 2px;
+}
+
+#workspaces button:hover {
+    background: @accent_soft;
+    color: @fg;
+}
+
+#workspaces button.active {
+    background: @accent;
+    color: @bg;
+    padding: 0 16px;
+}
+
+#workspaces button.urgent {
+    background: @urgent;
+    color: @bg;
+}
+
+/* ── Ventana activa ─────────────────────────────── */
+#window {
+    color: @fg;
+    font-weight: 500;
+    font-style: italic;
+}
+
+window#waybar.empty #window {
+    background: transparent;
+    border: none;
+}
+
+/* ── Reloj, protagonista del centro ─────────────── */
+#clock {
+    color: @accent;
+    font-weight: 700;
+    padding: 2px 18px;
+}
+
+/* ── Acentos por módulo ─────────────────────────── */
+#cpu         { color: @accent2; }
+#memory      { color: @accent;  }
+#temperature { color: @good;    }
+#backlight   { color: @warn;    }
+#pulseaudio  { color: @accent2; }
+#network     { color: @good;    }
+#battery     { color: @fg;      }
+
+#temperature.critical,
+#battery.critical:not(.charging) {
+    background: @urgent;
+    color: @bg;
+    animation: blink 1s steps(2) infinite;
+}
+
+#battery.charging { color: @good; }
+
+#network.disconnected {
+    background: @urgent;
+    color: @bg;
+}
+
+#pulseaudio.muted {
+    color: @fg_dim;
+}
+
+#custom-power {
+    color: @urgent;
+    padding: 2px 14px;
+}
+
+#custom-power:hover {
+    background: @urgent;
+    color: @bg;
+}
+
+#custom-notification {
+    color: @accent;
+}
+
+#tray menu {
+    background: @bg_solid;
+    color: @fg;
+    border-radius: 10px;
+}
+
+@keyframes blink {
+    to { background: @bg_rgb; color: @urgent; }
+}
+
+tooltip {
+    background: @bg_solid;
+    border: 1px solid @border_c;
+    border-radius: 12px;
+}
+
+tooltip label {
+    color: @fg;
+    padding: 4px;
+}

@@ -1,0 +1,15 @@
+show=drun
+width=520
+height=420
+location=center
+prompt=
+allow_images=true
+image_size=28
+allow_markup=true
+insensitive=true
+no_actions=true
+gtk_dark=true
+matching=fuzzy
+term=kitty
+key_expand=Tab
+hide_scroll=true

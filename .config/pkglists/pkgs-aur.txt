@@ -1,0 +1,13 @@
+cbonsai
+cmatrix-git
+davinci-resolve
+localsend-bin
+paru
+paru-debug
+pipes.sh
+python-pywal16
+ttf-ms-fonts
+tty-clock
+unimatrix-git
+wlogout
+zen-browser-bin
