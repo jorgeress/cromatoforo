@@ -27,6 +27,7 @@ eDP-2 de 1920x1080 a 144 Hz, escala 1.
   - [GTK](#gtk)
   - [wlogout y swaync](#wlogout-y-swaync)
   - [hyprlock](#hyprlock)
+- [Cómo probar un cambio](#cómo-probar-un-cambio)
 - [Trampas y hallazgos](#trampas-y-hallazgos)
 - [Lo que no se versiona](#lo-que-no-se-versiona)
 - [Dependencias](#dependencias)
@@ -391,6 +392,121 @@ que es la forma comoda de probarlos sin bloquear la pantalla.
 > cualquier tecla lo descarta sin contrasena.
 
 ---
+
+## Cómo probar un cambio
+
+Regla general: **mirar el resultado, no suponerlo**. Casi todo aquí falla en
+silencio — GTK cae al tema claro sin avisar, hyprlock ignora una opción
+inexistente sin más, pywal se come una llave. Comprobar cuesta diez segundos.
+
+### Hyprland (`hyprland.lua`)
+
+```bash
+cp ~/.config/hypr/hyprland.lua{,.bak}   # o el alias: bak ~/.config/hypr/hyprland.lua
+hyprctl reload
+hyprerr                                  # alias de: hyprctl rollinglog | grep -iE "err|warn"
+```
+
+Si algo peta y te quedas sin sesión usable, desde una TTY (`Ctrl+Alt+F2`):
+`cp ~/.config/hypr/hyprland.lua.bak ~/.config/hypr/hyprland.lua`.
+
+Para tantear un valor sin editar el fichero: `hyprctl eval '...'` (ver
+[trampas](#trampas-y-hallazgos)).
+
+### hyprlock
+
+**Nunca lo lances a pelo para probar**: si el cambio rompe algo, te quedas fuera.
+
+```bash
+hyprlock --grace 300      # 5 min en los que cualquier tecla lo descarta
+# desde otra terminal, o volviendo con Alt+Tab:
+pkill hyprlock
+```
+
+El `grace` alto es la red de seguridad por si el `pkill` no llega. Para revisar
+errores de configuración, lánzalo redirigiendo: `hyprlock --grace 300 > /tmp/hl.log 2>&1 &`
+y luego `grep -i "does not exist" /tmp/hl.log`.
+
+Los dos scripts de las etiquetas se prueban sueltos, sin bloquear nada:
+
+```bash
+~/.config/hypr/scripts/lock-battery.sh
+~/.config/hypr/scripts/lock-media.sh
+```
+
+### Aplicaciones GTK (Thunar y compañía)
+
+Los cambios de tema **solo se leen al arrancar**, y Thunar deja un demonio vivo
+en segundo plano, así que relanzarlo sin más no basta:
+
+```bash
+thunar -q && thunar        # -q mata el demonio primero
+zenity --info --text=prueba   # para probar el lado GTK4/libadwaita
+```
+
+Si dudas de si un color ha entrado de verdad, hazle una captura y mide el píxel:
+
+```bash
+grim /tmp/t.png && magick /tmp/t.png -crop 40x10+900+400 +repage \
+    -resize 1x1 -format "%[hex:p{0,0}]\n" info:
+```
+
+Cuidado con **dónde** mides: la vista de ficheros tiene fondo propio, distinto del
+de la ventana.
+
+### waybar
+
+```bash
+barlog     # alias: mata waybar y la relanza en primer plano, con sus errores a la vista
+```
+
+Los errores de CSS y de módulos salen ahí. `Ctrl+C` y `waybar &` para volver.
+
+### swaync
+
+```bash
+swaync-client --reload-css          # responde "success: true" o el error de parseo
+notify-send "Prueba" "Cuerpo de la notificación"
+swaync-client -t -sw                # abrir el centro de notificaciones
+```
+
+### wlogout
+
+Se puede lanzar sin miedo: **`Esc` lo cierra** sin ejecutar nada.
+
+```bash
+wlogout -b 3 -T 300 -B 300 -L 200 -R 200
+```
+
+### fastfetch
+
+```bash
+FF_LOGO=flor.txt fastfetch    # forzar un dot art concreto
+fflogos                        # ver todos con su nombre
+fastfetch --logo none          # solo el bloque de datos
+```
+
+Si un módulo sale vacío, pruébalo aislado: `fastfetch --logo none -s bateria`.
+
+### Prompt, btop, cava
+
+- starship: `exec bash` recarga la shell actual.
+- btop y cava: arrancarlos y ya. cava recarga colores con la tecla `c`.
+
+### Paleta entera
+
+```bash
+wall ~/Pictures/wallpapers/loquesea.jpg   # cambia fondo y repinta todo
+recolor                                    # regenera la paleta del fondo actual
+```
+
+### Antes de commitear
+
+```bash
+dots        # qué ha cambiado
+dotd        # el diff
+dota <fichero> && dotc "mensaje" && dotp
+```
 
 ## Trampas y hallazgos
 
