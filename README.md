@@ -229,7 +229,8 @@ Detecta sola si el arte trae códigos ANSI propios (usa `file-raw` y los respeta
 si es texto plano (usa `file`, que sustituye `$1`…`$9` por la paleta de pywal, con
 lo que el dibujo sigue al wallpaper).
 
-`fflogos` los muestra todos seguidos con su nombre, para descartar rápido.
+`fflogos` los muestra todos seguidos con su nombre, sin datos al lado, para
+descartar rápido.
 
 **Tamaños.** Medidos en este equipo, no estimados:
 
@@ -240,8 +241,9 @@ lo que el dibujo sigue al wallpaper).
 | Bloque de datos de fastfetch | **25 líneas**, ~67 columnas |
 | Relleno del logo | 2 columnas a la izquierda, 4 a la derecha |
 
-De ahí sale el presupuesto: `2 + arte + 4 + 67 ≤ 181`, o sea hasta 108 columnas
-de arte. Pero conviene no apurarlo:
+De ahí sale el presupuesto con la ventana maximizada: `2 + arte + 4 + 67 ≤ 181`,
+o sea hasta 108 columnas de arte. Pasarse ya no rompe nada — el dibujo se va
+arriba o no sale —, pero cuanto más ancho, menos veces sale al lado de los datos:
 
 - **Ancho recomendado: hasta ~90 columnas.** Punto dulce entre 40 y 70.
 - **Alto máximo: ~40 líneas** antes de que la salida no quepa en la ventana.
@@ -254,23 +256,41 @@ título largo se pasa de ahí. El margen es para eso.
 El arte en braille (`⣿⠿⠛`) cuenta como un carácter por columna, así que el ancho
 en caracteres es directamente el ancho en columnas.
 
-**Centrado automático.** La función mide el dibujo y el bloque de datos en cada
-ejecución y calcula dos rellenos:
+**Se ajusta al ancho de la ventana.** fastfetch pinta el dibujo y luego salta a
+una columna fija para los datos. Si los dos juntos no caben, las líneas se parten
+contra el borde y el dibujo se desmonta; no hay opción de fastfetch que lo evite.
+Así que la función mide primero y elige modo:
 
-- `--logo-padding-left` para que el conjunto quede **centrado horizontalmente** en
-  la ventana, sea cual sea el ancho del dibujo.
-- `--logo-padding-top` para **centrar el dibujo verticalmente** respecto a los
-  datos, cuando el dibujo es más bajo.
+| Cabe en la ventana | Modo |
+|---|---|
+| `2 + arte + 4 + datos` | **lado a lado**, el conjunto centrado |
+| solo el ancho del arte | **dibujo arriba** centrado, datos debajo |
+| ni eso | **sin dibujo**, solo los datos |
 
-Si el dibujo es **más alto** que el bloque de datos se queda alineado arriba y
-continúa por debajo. No es un descuido: fastfetch no tiene relleno vertical para
-el lado de los módulos, y `--structure` permitiría anteponer líneas en blanco pero
-**descarta las claves definidas en el JSON** (saldría `Host` en vez de `Equipo`).
-Si quieres un dibujo alto perfectamente centrado, recórtalo a 25 líneas o menos.
+Y el **sorteo entra solo entre los dibujos que caben** en el modo elegido: en una
+ventana media salen los estrechos, y ninguno sale partido. Con la ventana
+maximizada (181 columnas) entran todos.
+
+En el modo apilado los datos van pegados a la izquierda a propósito: fastfetch
+los coloca con columnas absolutas (`\033[NG`), y cualquier sangrado que se les
+ponga delante los descuadra.
+
+En modo lado a lado sigue habiendo **centrado vertical**: `--logo-padding-top`
+centra el dibujo respecto a los datos cuando el dibujo es más bajo. Si es **más
+alto** se queda alineado arriba y continúa por debajo. No es un descuido:
+fastfetch no tiene relleno vertical para el lado de los módulos, y `--structure`
+permitiría anteponer líneas en blanco pero **descarta las claves definidas en el
+JSON** (saldría `Host` en vez de `Equipo`). Si quieres un dibujo alto
+perfectamente centrado, recórtalo a 25 líneas o menos.
 
 Medir el bloque cuesta una ejecución extra de fastfetch, unos 50 ms. Es
 imperceptible y evita tener números cableados que se quedan obsoletos en cuanto
-tocas los módulos.
+tocas los módulos. Va con `--pipe false`: en modo tubería fastfetch quita colores
+y barras, y entonces el ancho medido no sería el que se va a pintar.
+
+**Límite de abajo:** por debajo de ~68 columnas ya no es el dibujo lo que estorba,
+sino el propio bloque de datos, que es lo que mide de ancho. Ahí no hay nada que
+recortar salvo módulos.
 
 **Previsualizar uno concreto** sin esperar a que salga por sorteo:
 
