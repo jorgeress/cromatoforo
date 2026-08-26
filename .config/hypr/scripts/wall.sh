@@ -43,6 +43,10 @@ pkill -SIGUSR1 kitty || true                    # kitty relee colores en calient
 #                con la tecla 'c' (colores) o 'r'; no acepta senales, y mandarle
 #                SIGUSR1 lo mataria.
 #   wlogout   -> lee su CSS al lanzarse.
+#   zsh       -> ~/.cache/wal/zsh-colors.zsh (autosuggestions y syntax-
+#                highlighting) se lee al abrir la shell. Las terminales ya
+#                abiertas conservan los colores viejos de los plugins; el
+#                resto del tema (fondo, paleta ANSI, prompt) si cambia.
 
 # 4. Colores en terminales ya abiertas
 for tty in /dev/pts/*; do

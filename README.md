@@ -16,6 +16,7 @@ eDP-2 de 1920x1080 a 144 Hz, escala 1.
 - [El sistema de color](#el-sistema-de-color)
 - [Instalación en una máquina nueva](#instalación-en-una-máquina-nueva)
 - [Estructura](#estructura)
+  - [El reparto entre zsh y bash](#el-reparto-entre-zsh-y-bash)
 - [Atajos de teclado](#atajos-de-teclado)
 - [Personalización](#personalización)
   - [Wallpaper y paleta](#wallpaper-y-paleta)
@@ -48,6 +49,7 @@ wallpaper.jpg
                       ├── colors-hyprlock.conf → hyprlock            (source)
                       ├── colors-kitty.conf    → kitty               (include)
                       ├── starship.toml        → starship            (STARSHIP_CONFIG)
+                      ├── zsh-colors.zsh       → plugins de zsh      (source en .zshrc)
                       ├── pywal.theme          → btop                (enlace simbólico)
                       ├── cava-config          → cava                (enlace simbólico)
                       └── sequences            → terminales abiertas
@@ -60,7 +62,7 @@ del programa final.**
 `~/.config/hypr/scripts/wall.sh` hace la pasada completa: cambia el fondo con
 `awww`, regenera la paleta y recarga a cada consumidor.
 
-Tres consumidores no necesitan recarga explícita, y está documentado dentro del
+Cuatro consumidores no necesitan recarga explícita, y está documentado dentro del
 propio `wall.sh` para que nadie la añada por error:
 
 | Programa | Por qué no hace falta |
@@ -68,6 +70,12 @@ propio `wall.sh` para que nadie la añada por error:
 | starship | `STARSHIP_CONFIG` apunta al caché y starship relee el fichero en cada prompt |
 | btop | `~/.config/btop/themes/pywal.theme` es un enlace al caché; lo coge al arrancar |
 | cava | `~/.config/cava/config` es un enlace al caché; recarga con la tecla `c` |
+| plugins de zsh | `~/.zshrc` sourcea el caché al abrir la shell; las ya abiertas se quedan con los colores viejos hasta un `exec zsh` |
+
+**Ojo con `zsh-colors.zsh`:** pywal pasa las plantillas por `str.format()`, así que
+ahí no puede haber llaves literales. Por eso el fichero usa `ZSH_HIGHLIGHT_STYLES[x]`
+con corchetes y no interpola nada con `${...}`: una llave suelta aborta la
+generación de **todas** las plantillas, no solo de esa.
 
 > **Aviso sobre cava:** no le mandes `SIGUSR1` para recargar. No lo soporta, y la
 > acción por defecto de esa señal es terminar el proceso.
@@ -99,6 +107,9 @@ dot config status.showUntrackedFiles no
 sudo pacman -S --needed - < ~/.config/pkglists/pkgs-repo.txt
 paru -S --needed - < ~/.config/pkglists/pkgs-aur.txt
 
+# 6b. zsh como shell de trabajo (bash se queda para los scripts)
+chsh -s /usr/bin/zsh
+
 # 7. Primera paleta
 mkdir -p ~/Pictures/wallpapers   # mete ahí tus imágenes
 awww-daemon &
@@ -106,7 +117,7 @@ awww-daemon &
 ```
 
 El alias definitivo (`dot`, más `dots`, `dota`, `dotc`, `dotp`, `dotl`) ya viene
-en `~/.config/shell/aliases.sh`, que `~/.bashrc` carga.
+en `~/.config/shell/aliases.sh`, que cargan tanto `~/.zshrc` como `~/.bashrc`.
 
 Si el paso 3 se queja de que sobrescribiría ficheros, muévelos antes o acepta la
 pérdida con `dot checkout -f`.
@@ -139,13 +150,41 @@ pérdida con `dot checkout -f`.
 ├── cava/                     visualizador de audio (enlace al caché)
 ├── gtk-3.0/  gtk-4.0/        tematizado de las apps GTK
 ├── wal/templates/            LAS PLANTILLAS. El origen de todos los colores
-├── shell/aliases.sh          alias, funciones y arranque de shell
+├── shell/
+│   ├── env.sh                variables de entorno (POSIX, zsh y bash)
+│   └── aliases.sh            alias y funciones (zsh y bash)
 └── pkglists/                 listas de paquetes, regenerables con `pkglist`
 .local/bin/
 ├── widgets                   eye candy propio
 └── gtk-apply                 reaplica los ajustes GTK que viven en dconf
-.bashrc
+.zshenv       lee env.sh; se ejecuta siempre, hasta en scripts
+.zprofile     login: arranca Hyprland en la tty1
+.zshrc        opciones, historia, completado, teclas, plugins
+.bashrc       bash interactivo; lee los mismos env.sh y aliases.sh
+.bash_profile login de bash; arranca Hyprland igual que .zprofile
 ```
+
+### El reparto entre zsh y bash
+
+zsh es el shell **interactivo**; bash se queda para los **scripts**, que llevan su
+propio `#!/usr/bin/env bash` y por tanto no dependen del login shell.
+
+Lo que comparten los dos vive en `~/.config/shell/`, en POSIX estricto:
+
+| Fichero | Qué lleva | Cuándo se lee |
+|---|---|---|
+| `env.sh` | `PATH`, `EDITOR`, `XDG_*`, `STARSHIP_CONFIG` | login (`.zshenv` / `.bash_profile`) |
+| `aliases.sh` | alias y funciones | interactivo (`.zshrc` / `.bashrc`) |
+
+Por eso `aliases.sh` no puede usar `mapfile`, `shopt` ni indexar arrays con `[0]`:
+zsh los cuenta desde 1. Si necesitas algo propio de un shell, va en su `rc`.
+
+**Red de seguridad:** si zsh se rompe, `bash -l` da un entorno equivalente, porque
+lee esos mismos dos ficheros.
+
+**Trampa del `chsh`:** el autoarranque de Hyprland estaba solo en `.bash_profile`.
+Al pasar el login shell a zsh ese fichero deja de leerse y arrancas en una tty
+pelada. Por eso el `exec start-hyprland` está duplicado en `.zprofile`, a propósito.
 
 ---
 
@@ -510,7 +549,10 @@ Si un módulo sale vacío, pruébalo aislado: `fastfetch --logo none -s bateria`
 
 ### Prompt, btop, cava
 
-- starship: `exec bash` recarga la shell actual.
+- starship: `exec zsh` recarga la shell actual.
+- plugins de zsh: los colores de `zsh-autosuggestions` y `zsh-syntax-highlighting`
+  se leen al abrir la shell, así que las terminales ya abiertas se quedan con los
+  viejos. `exec zsh` también los actualiza.
 - btop y cava: arrancarlos y ya. cava recarga colores con la tecla `c`.
 
 ### Paleta entera
