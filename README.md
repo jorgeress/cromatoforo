@@ -849,10 +849,24 @@ prime-run gamemoderun mangohud %command%
 
 `prime-run` (del paquete `nvidia-prime`) es lo no negociable: exporta
 `__NV_PRIME_RENDER_OFFLOAD=1`, `__GLX_VENDOR_LIBRARY_NAME=nvidia` y
-`__VK_LAYER_NV_optimus=NVIDIA_only`. Para OpenGL nativo es obligatorio o va en la
-Intel, seguro. Para Vulkan y Proton, DXVK *suele* preferir la GPU discreta, pero
-"suele" no es "siempre"; ese último flag esconde la Intel del enumerado y lo hace
-determinista.
+`__VK_LAYER_NV_optimus=NVIDIA_only`.
+
+Medido en esta máquina, que es distinto de lo que suele contarse:
+
+| | Sin `prime-run` | Con `prime-run` |
+|---|---|---|
+| OpenGL (`glxinfo -B`) | Mesa Intel (RPL-P) | NVIDIA RTX 4060 |
+| Vulkan, dispositivo 0 | Intel (RPL-P) | NVIDIA RTX 4060 |
+| Vulkan, dispositivo 1 | NVIDIA RTX 4060 | Intel (RPL-P) |
+
+O sea: para **OpenGL es obligatorio**, sin discusión, o va en la Intel.
+
+Para **Vulkan** el efecto real es **reordenar, no esconder**. `__VK_LAYER_NV_optimus`
+actúa sobre la capa de NVIDIA, no sobre el ICD de Mesa, así que la Intel se sigue
+enumerando; lo que cambia es quién es el dispositivo 0. Importa igual: DXVK y
+vkd3d prefieren la GPU discreta por su cuenta, pero un juego Vulkan nativo que
+coja `physicalDevices[0]` sin mirar se llevaría la Intel. Con `prime-run` deja de
+depender de la suerte.
 
 **Cómo comprobar que funcionó.** `~/.config/MangoHud/MangoHud.conf` arranca
 oculto y se conmuta con `Shift_R+F12`. Lleva `gpu_name` activado justo para esto:
@@ -883,8 +897,21 @@ GameMode lo pone a 0 mientras juegas y lo restaura al salir, pero necesita
 permiso:
 
 ```bash
-sudo usermod -aG gamemode $USER    # y cerrar sesión y volver a entrar
-gamemoded -t                       # debe decir "All Tests Passed!"
+sudo usermod -aG gamemode $USER
+```
+
+**No hace falta cerrar sesión**, aunque todas las guías lo digan: la regla de
+`/usr/share/polkit-1/rules.d/gamemode.rules` usa `subject.isInGroup("gamemode")`,
+y polkit resuelve los grupos por UID contra la base de datos del sistema, no por
+las credenciales del proceso. Surte efecto al momento.
+
+Comprobarlo de verdad, que es más útil que `gamemoded -t`:
+
+```bash
+sysctl -n kernel.split_lock_mitigate          # 1
+gamemoderun sleep 6 &
+sleep 2; sysctl -n kernel.split_lock_mitigate # 0  <- funciona
+wait; sysctl -n kernel.split_lock_mitigate    # 1  <- restaurado
 ```
 
 No hay sección `[gpu]` en el `.ini`: con `apply_gpu_optimisations` puesto a
