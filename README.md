@@ -3,8 +3,11 @@
 Configuración completa de un escritorio Wayland sobre Arch, con una idea de fondo:
 **todo el sistema se pinta a partir del wallpaper**. Cambias el fondo y la barra,
 el lanzador, el terminal, el prompt, las notificaciones, el menú de apagado, el
-monitor de sistema y hasta las aplicaciones GTK adoptan su paleta en la misma
-pasada.
+monitor de sistema, el editor, el navegador y las aplicaciones GTK y Qt adoptan
+su paleta en la misma pasada.
+
+Lo que sigue al fondo y lo que no está en
+[Qué se tematiza y qué no](#qué-se-tematiza-y-qué-no), medido en este equipo.
 
 Equipo de referencia: MSI Stealth 15 (i7-13620H + RTX 4060 híbrida), pantalla
 eDP-2 de 1920x1080 a 144 Hz, escala 1.
@@ -14,6 +17,7 @@ eDP-2 de 1920x1080 a 144 Hz, escala 1.
 ## Índice
 
 - [El sistema de color](#el-sistema-de-color)
+- [Qué se tematiza y qué no](#qué-se-tematiza-y-qué-no)
 - [Instalación en una máquina nueva](#instalación-en-una-máquina-nueva)
 - [Estructura](#estructura)
   - [El reparto entre zsh y bash](#el-reparto-entre-zsh-y-bash)
@@ -26,8 +30,14 @@ eDP-2 de 1920x1080 a 144 Hz, escala 1.
   - [Prompt (starship)](#prompt-starship)
   - [btop y cava](#btop-y-cava)
   - [GTK](#gtk)
+  - [Qt](#qt)
+  - [Steam](#steam)
+  - [Spotify](#spotify)
+  - [Code - OSS](#code---oss)
+  - [Zen Browser](#zen-browser)
   - [wlogout y swaync](#wlogout-y-swaync)
   - [hyprlock](#hyprlock)
+- [Juegos](#juegos)
 - [Cómo probar un cambio](#cómo-probar-un-cambio)
 - [Trampas y hallazgos](#trampas-y-hallazgos)
 - [Lo que no se versiona](#lo-que-no-se-versiona)
@@ -52,6 +62,12 @@ wallpaper.jpg
                       ├── zsh-colors.zsh       → plugins de zsh      (source en .zshrc)
                       ├── pywal.theme          → btop                (enlace simbólico)
                       ├── cava-config          → cava                (enlace simbólico)
+                      ├── colors-qt.conf       → qt5ct/qt6ct → OBS y
+                      │                          demás apps Qt        (ruta en el .conf)
+                      ├── colors-steam.css     → Steam               (copiado a steamui)
+                      ├── spicetify-color.ini  → Spotify             (copiado al tema)
+                      ├── colors-vscode-custom → Code - OSS          (fundido en settings.json)
+                      ├── colors-zen.css       → Zen Browser         (enlace a userChrome.css)
                       └── sequences            → terminales abiertas
 ```
 
@@ -71,6 +87,13 @@ propio `wall.sh` para que nadie la añada por error:
 | btop | `~/.config/btop/themes/pywal.theme` es un enlace al caché; lo coge al arrancar |
 | cava | `~/.config/cava/config` es un enlace al caché; recarga con la tecla `c` |
 | plugins de zsh | `~/.zshrc` sourcea el caché al abrir la shell; las ya abiertas se quedan con los colores viejos hasta un `exec zsh` |
+| Steam | el CSS se lee al arrancar el cliente. `wall.sh` lo regenera pero **no reinicia Steam**: te lo cerraría en mitad de una partida |
+| Spotify | igual. `spotify-theme.sh` solo aplica el parche si Spotify está cerrado |
+
+Y uno que **sí** necesita un empujón raro, `qt6ct`: el plugin vigila
+`~/.config/qt6ct/qt6ct.conf`, no el esquema de color al que ese fichero apunta.
+Regenerar `colors-qt.conf` no repinta nada. Por eso `wall.sh` hace `touch` del
+`.conf`: es lo que despierta al vigilante. Ver [trampas](#trampas-y-hallazgos).
 
 **Ojo con `zsh-colors.zsh`:** pywal pasa las plantillas por `str.format()`, así que
 ahí no puede haber llaves literales. Por eso el fichero usa `ZSH_HIGHLIGHT_STYLES[x]`
@@ -79,6 +102,62 @@ generación de **todas** las plantillas, no solo de esa.
 
 > **Aviso sobre cava:** no le mandes `SIGUSR1` para recargar. No lo soporta, y la
 > acción por defecto de esa señal es terminar el proceso.
+
+---
+
+## Qué se tematiza y qué no
+
+Estado real, comprobado en este equipo. Nada de "debería funcionar".
+
+### Cambia solo, al vuelo (SUPER+W y ya)
+
+| Programa | Vía | Notas |
+|---|---|---|
+| Hyprland | `colors-hypr.lua` | bordes, sombras, glow |
+| waybar | `colors-gtk.css` | `SIGUSR2` |
+| wofi | `colors-gtk.css` | lee el CSS al lanzarse |
+| swaync | `colors-gtk.css` | `swaync-client --reload-css` |
+| wlogout | `colors-gtk.css` | lee el CSS al lanzarse |
+| kitty | `colors-kitty.conf` | `SIGUSR1`, repinta en caliente |
+| starship | `starship.toml` | relee en cada prompt |
+| GTK3 / GTK4 | `colors-gtk.css` | Thunar, pavucontrol, GIMP, nwg-look |
+| hyprlock | `colors-hyprlock.conf` | al bloquear |
+| **Code - OSS** | `colors-vscode-custom.json` | VS Code relee `settings.json` en caliente |
+| terminales abiertas | `sequences` | paleta ANSI y fondo |
+
+### Cambia, pero con retraso o al reabrir
+
+| Programa | Cuándo entra | Por qué |
+|---|---|---|
+| **Apps Qt6** (OBS Studio, qt6ct) | 1-2 s después del cambio | el `touch` de `qt6ct.conf` despierta al vigilante del plugin |
+| btop | al arrancar | el tema es un enlace al caché |
+| cava | al pulsar `c` o al arrancar | no acepta señales de recarga |
+| plugins de zsh | en shells nuevas | `.zshrc` sourcea el caché al abrir |
+| **Steam** | al arrancar el cliente | CSS inyectado en `steamui/`, no recarga en caliente |
+| **Spotify** | tras `spicetify apply` y reabrir | hay que reparchear el bundle de Electron |
+| **Zen Browser** | al reiniciar el navegador | Firefox y sus forks no recargan el CSS del chrome en caliente |
+
+### No sigue la paleta, y no es un descuido
+
+| Programa | Por qué |
+|---|---|
+| DaVinci Resolve | Qt con estilo propio incrustado. **No se toca**: es la herramienta de trabajo y su corrección de color depende de que la interfaz sea neutra |
+| Discord | Electron sin CSS de usuario. Necesitaría un mod de cliente (Vencord/OpenAsar), que va contra sus términos de servicio |
+| Iconos y cursor | Adwaita fijo. Recolorear un tema de iconos entero en cada cambio de fondo es caro y queda mal |
+
+### Aplicaciones Qt5
+
+`QT_QPA_PLATFORMTHEME=qt6ct` **solo** vale para Qt6: una app Qt5 busca un plugin
+con ese nombre, no lo encuentra y se queda con su aspecto de fábrica. El fichero
+`~/.config/qt5ct/qt5ct.conf` está puesto y apunta al mismo esquema, así que para
+una app Qt5 suelta basta con lanzarla así:
+
+```bash
+QT_QPA_PLATFORMTHEME=qt5ct la-app
+```
+
+En este equipo ahora mismo no hay ninguna app Qt5 de uso diario, por eso la
+variable global se queda en `qt6ct`.
 
 ---
 
@@ -103,6 +182,15 @@ dot config status.showUntrackedFiles no
 # 5. Los ajustes que viven en dconf y no se pueden versionar
 ~/.local/bin/gtk-apply
 
+# 5b. Qt: reescribe la ruta absoluta del esquema de color para ESTE usuario.
+#     qt6ct no expande ~ ni $HOME, así que sin esto las apps Qt se quedan
+#     con su gris de fábrica y no avisan de nada.
+~/.local/bin/qt-apply
+
+# 5c. Zen Browser: enlaza el userChrome del perfil (el nombre del directorio
+#     de perfil es aleatorio, por eso no se puede versionar la ruta).
+~/.local/bin/zen-apply
+
 # 6. Paquetes
 sudo pacman -S --needed - < ~/.config/pkglists/pkgs-repo.txt
 paru -S --needed - < ~/.config/pkglists/pkgs-aur.txt
@@ -114,6 +202,10 @@ chsh -s /usr/bin/zsh
 mkdir -p ~/Pictures/wallpapers   # mete ahí tus imágenes
 awww-daemon &
 ~/.config/hypr/scripts/wall.sh ~/Pictures/wallpapers/loquesea.jpg
+
+# 8. Opcional: Steam y Spotify (ver sus apartados en Personalización)
+~/.config/hypr/scripts/steam-theme.sh   --status
+~/.config/hypr/scripts/spotify-theme.sh --status
 ```
 
 El alias definitivo (`dot`, más `dots`, `dota`, `dotc`, `dotp`, `dotl`) ya viene
@@ -135,6 +227,11 @@ pérdida con `dot checkout -f`.
 │   └── scripts/
 │       ├── wall.sh           cambia fondo + repinta todo el sistema
 │       ├── wallpicker.sh     selector visual de fondos (wofi con miniaturas)
+│       ├── steam-theme.sh    inyecta la paleta en el cliente de Steam
+│       ├── spotify-theme.sh  inyecta la paleta en Spotify (spicetify)
+│       ├── code-theme.sh     funde la paleta en el settings.json de Code
+│       ├── hyprlock-test.sh  prueba hyprlock en headless, nunca en tu sesion
+│       ├── hyprlock-rescue.sh rescate si hyprlock se queda colgado
 │       ├── lock-battery.sh   linea de bateria para hyprlock
 │       └── lock-media.sh     linea de reproduccion para hyprlock
 ├── waybar/                   barra: config.jsonc + style.css
@@ -149,14 +246,22 @@ pérdida con `dot checkout -f`.
 ├── btop/                     monitor de sistema
 ├── cava/                     visualizador de audio (enlace al caché)
 ├── gtk-3.0/  gtk-4.0/        tematizado de las apps GTK
+├── qt5ct/  qt6ct/            tematizado de las apps Qt (apuntan al caché)
 ├── wal/templates/            LAS PLANTILLAS. El origen de todos los colores
 ├── shell/
 │   ├── env.sh                variables de entorno (POSIX, zsh y bash)
 │   └── aliases.sh            alias y funciones (zsh y bash)
+├── systemd/user/
+│   ├── spotify-theme.path    vigila si una actualizacion se llevo el parche
+│   └── spotify-theme.service lo reaplica  (hay que `systemctl --user enable`)
+├── MangoHud/MangoHud.conf    HUD de juegos; oculto, Shift_R+F12 lo saca
+├── gamemode.ini              GameMode; lee los comentarios antes de tocarlo
 └── pkglists/                 listas de paquetes, regenerables con `pkglist`
 .local/bin/
 ├── widgets                   eye candy propio
-└── gtk-apply                 reaplica los ajustes GTK que viven en dconf
+├── gtk-apply                 reaplica los ajustes GTK que viven en dconf
+├── qt-apply                  arregla la ruta absoluta del esquema Qt
+└── zen-apply                 engancha el perfil de Zen al userChrome de pywal
 .zshenv       lee env.sh; se ejecuta siempre, hasta en scripts
 .zprofile     login: arranca Hyprland en la tty1
 .zshrc        opciones, historia, completado, teclas, plugins
@@ -416,6 +521,281 @@ funciona; la explicación está en [trampas](#trampas-y-hallazgos).
 Iconos y cursor son Adwaita porque es lo único instalado. Si instalas algo como
 `papirus-icon-theme`, cámbialo en los dos `settings.ini` y en `gtk-apply`.
 
+### Qt
+
+Las aplicaciones Qt no leen nada de GTK. El puente es `qt6ct`, que sí acepta un
+esquema de color externo, y ahí es donde entra pywal:
+
+```
+~/.config/wal/templates/colors-qt.conf
+        │  wal -i
+        ▼
+~/.cache/wal/colors-qt.conf          ← 21 colores ARGB por fila
+        ▲
+        │  color_scheme_path (ruta absoluta)
+~/.config/qt6ct/qt6ct.conf           ← estático, se versiona
+```
+
+Tres cosas que hay que respetar o no funciona:
+
+1. **`style=Fusion`.** Es el único estilo que aplica la paleta personalizada
+   entera. Con el estilo por defecto entra a medias.
+2. **`custom_palette=true`.** Sin esto ignora `color_scheme_path`.
+3. **La ruta es absoluta y no expande `$HOME`.** Por eso existe `qt-apply`.
+
+Para cambiar el mapeo de colores se toca la plantilla, nunca `qt6ct.conf`.
+
+Quién se beneficia hoy: **OBS Studio** (Qt6), el propio `qt6ct` y cualquier
+cosa Qt6 que instales. DaVinci Resolve no, y es a propósito.
+
+### Steam
+
+Steam **no es GTK ni Qt**: su interfaz es Chromium empaquetado (CEF), así que el
+tema del sistema no le llega. Hay que inyectarle CSS.
+
+Montaje (una sola vez):
+
+```bash
+sudo pacman -S steam
+git clone https://github.com/tkashkin/Adwaita-for-Steam.git \
+    ~/.local/share/adwaita-for-steam
+# Abre Steam una vez y cierralo: hasta que no exista ~/.local/share/Steam el
+# instalador del tema no tiene donde escribir.
+~/.config/hypr/scripts/steam-theme.sh --restart
+```
+
+Clónalo **completo**, sin `--depth 1`: `--status` usa `git describe --tags` y
+`rev-list HEAD..@{u}`, y con un clon superficial los dos mienten.
+
+A partir de ahí, cada `SUPER+W` regenera `~/.cache/wal/colors-steam.css` (un
+*color theme* de Adwaita-for-Steam con la paleta del fondo) y lo reinstala. El
+cliente lo coge **al arrancar**: `wall.sh` no reinicia Steam nunca por su cuenta.
+Para verlo ya, `steam-theme.sh --restart`.
+
+`steam-theme.sh --status` dice qué falta, qué versión tienes y cuántos commits
+te faltan.
+
+**Mantenerlo al día.** Es un clon de git, así que nada te avisa cuando sale una
+versión nueva — y hace falta, porque el skin se rompe cuando Valve cambia la
+interfaz del cliente. El ritmo va a rachas: de la 4.0 a la 4.4 en tres semanas de
+julio de 2026, y antes de eso casi un año sin tocar nada.
+
+`steam-theme.sh` comprueba si hay novedades **una vez al día como mucho** (un
+fichero de sello en `~/.cache` evita ir a la red en cada `SUPER+W`) y te lo dice
+con `notify-send`. Nunca hace `git pull` solo: es código que se inyecta en tu
+cliente de Steam, y eso se actualiza a mano y mirando el diff.
+
+```bash
+steam-theme.sh --update    # git pull --ff-only y reaplica
+```
+
+**Las otras dos opciones**, por si el día de mañana prefieres otra cosa:
+
+| | Avisa de actualizaciones | Encaja con pywal |
+|---|---|---|
+| Instalador + este script | sí, por notificación diaria | sí, es lo que hay montado |
+| `adwsteamgtk` (AUR, 16 votos) | sí, vía `paru -Syu` | no: es una GUI, no se puede guionizar |
+| Millennium | sí, avisa dentro del cliente | sí, mismo formato de CSS |
+
+`adwsteamgtk` es la única de las tres que se actualiza con el sistema, pero es un
+envoltorio gráfico: no hay manera de meterle un CSS nuevo desde `wall.sh`.
+
+**Por qué gana nuestro CSS.** El tema base (`adwaita`) trae sus propios colores
+con `!important`, así que el orden del cascade decide. Comprobado ya con Steam
+instalado, no solo leyendo el código: el parche que se inyecta en `steamui` importa primero el tema y
+**después** `config.css`, que es donde cae nuestro `custom.css`. Al ir el último
+entre declaraciones igual de específicas, gana. Además, el import del colortheme
+solo se emite `if self.color_theme != "adwaita"`, así que pasando `-c adwaita` no
+hay ningún colortheme compitiendo: solo el nuestro.
+
+**Sobre Millennium: por qué no, y qué lo cambiaría.**
+
+Millennium es la alternativa más nombrada y es un proyecto sano (4.238 estrellas,
+MIT, C++, en desarrollo activo). No se descarta por malo. Se descarta por cómo
+encaja aquí.
+
+*1. Se instala secuestrando una biblioteca.* Su script de instalación hace:
+
+```bash
+ln -sf /usr/lib/millennium/libmillennium_bootstrap_x86.so \
+       "$HOME/.local/share/Steam/ubuntu12_32/libXtst.so.6"
+```
+
+Sustituye la `libXtst.so.6` que Steam trae —la del *X11 Test Extension*— por la
+suya. Steam la carga creyendo que es la de X11 y así entra Millennium en el
+proceso. Antes usaba `LD_PRELOAD`; el propio script limpia esos restos.
+
+*2. De ahí sale el riesgo que de verdad importa.* Si algo se rompe con el
+inyector, **Steam puede no arrancar**: le falta una biblioteca que espera cargar.
+Con la vía del CSS, lo peor que pasa es que Steam se vea feo, y el instalador
+tiene `--uninstall`. Un fallo cosmético frente a un fallo que te deja sin cliente.
+
+*3. Compilar cuesta y aun así vas por detrás.* El paquete `millennium` del AUR se
+construye desde fuente con `cmake`, `ninja`, `rust`, `bun` y una pila de
+dependencias `lib32`. Y está clavado a un commit concreto en la 3.4.1, mientras
+arriba ya van por la v3.5.0-beta.2: solo en agosto de 2026 salieron la 3.4.0, la
+3.4.1 y dos betas de la 3.5.
+
+*4. Y ahora lo interesante: la ventaja real que tendría.* Millennium tiene un
+fichero `quick.css` en `$MILLENNIUM__CONFIG_PATH`, un vigilante inotify sobre él
+(`src/util/file_watcher.cc`) y una función `OnQuickCssFileChanged` expuesta al
+cliente que reinyecta el CSS en todos los popups **sin reiniciar Steam**. Eso es
+exactamente lo único que a este montaje le falta.
+
+Salvo que hoy no funciona: `Core_WatchQuickCss` solo aparece declarado en
+`utils/ffi.ts` y en los ficheros de prueba. **Nada del frontend llama nunca a
+`registerWatcher`.** El vigilante existe en el backend y no lo arranca nadie, así
+que la ruta en vivo solo se dispara escribiendo en el editor de Millennium.
+
+O sea que está a una línea de ser mejor opción que esto. **El día que lo
+conecten, merece la pena cambiarse**, porque el repintado en caliente es lo único
+que la vía del instalador no puede dar. Mientras tanto, no.
+
+*5. Detalle de nomenclatura.* En el AUR el paquete es **`millennium`** (o
+`millennium-bin`). `millennium-steam-patcher` **no existe**, aunque circule mucho
+ese nombre.
+
+Si algún día te pasas, la plantilla de pywal vale igual: `quick.css` admite el
+mismo CSS de variables `--adw-*` que generamos ahora.
+
+**Reglas de ventana.** Van en `hyprland.lua` y son tan importantes como el tema.
+Steam es XWayland y sus menús desplegables se abren sin título y con tamaño cero:
+Hyprland les quita el foco al soltar el ratón y el menú desaparece. La traducción
+a la API Lua de 0.56 de la receta clásica del wiki:
+
+```
+stayfocused, class:^(steam)$, title:^()$   →   stay_focused = true
+minsize 1 1, class:^(steam)$, title:^()$   →   min_size     = "1 1"
+```
+
+**GPU.** En las opciones de lanzamiento de cada juego:
+
+```
+prime-run %command%                 # usa la 4060 en vez de la Intel
+prime-run mangohud %command%        # + monitor de rendimiento
+```
+
+Aquí `prime-run` sí es lo que quieres, al contrario que con DaVinci Resolve
+(ver [trampas](#trampas-y-hallazgos)).
+
+### Spotify
+
+También Electron, también hay que parchear el bundle. La herramienta es
+`spicetify`:
+
+```bash
+paru -S spicetify-cli
+~/.config/hypr/scripts/spotify-theme.sh --force
+systemctl --user enable --now spotify-theme.path   # ver mas abajo: reaplicado automatico
+```
+
+El tercer comando **hace falta**: el enlace de `default.target.wants/` que crea
+`systemctl enable` es estado de systemd, no configuracion, y no se versiona.
+Sin el, las unidades estan en el repo pero dormidas.
+
+`SUPER+W` regenera `~/.cache/wal/spicetify-color.ini` y lo copia al tema
+`~/.config/spicetify/Themes/pywal/`. El parche en sí (`spicetify apply`) **solo
+se lanza si Spotify está cerrado**; con `--force` se aplica igualmente.
+
+**Lo caro no es el tiempo, es el reinicio.** Medido en este equipo: el trabajo
+gordo de `spicetify apply` es descomprimir, parchear y recomprimir
+`Apps/xpui.spa`, que son 11 MB comprimidos, 39 MB y 543 ficheros al abrirlo. Ese
+ciclo tarda **~1 s**, y el `apply` completo unos pocos segundos contando el
+arranque del proceso y la copia de seguridad.
+
+O sea que no molesta por lento. Molesta porque Spotify carga ese bundle **al
+arrancar**: para ver el color nuevo hay que cerrarlo y abrirlo. Por eso el script
+no lo hace mientras esté sonando algo.
+
+**Si quisieras color en vivo**, existe: `spicetify watch -l` levanta un vigilante
+que se conecta al depurador remoto de Spotify y le manda un reload cuando cambia
+el `color.ini`. Pero pide `spicetify enable-devtools` (que parchea `offline.bnk`)
+y dejar un demonio corriendo. Para un cambio de wallpaper no compensa; para
+diseñar un tema, sí.
+
+Dos cosas propias de `spotify-launcher` que no salen en las guías:
+
+1. El cliente **no está en `/opt`**, sino en
+   `~/.local/share/spotify-launcher/install/usr/share/spotify`. Como es del
+   usuario, aquí **no hace falta** el `sudo chmod a+wr` que piden todos los
+   tutoriales (escritos para el paquete `spotify` del AUR). Lo que sí hace falta
+   es decirle la ruta a spicetify, y de eso se encarga el script.
+2. `spotify-launcher` reextrae el `.deb` en cada actualización y **se lleva por
+   delante el parche**, en silencio. Spotify publica cada 1-3 semanas, así que
+   pasa a menudo. No es un fallo del montaje: es cómo funciona el launcher.
+
+**Eso está resuelto y no hay que hacer nada.** La unidad `spotify-theme.path`
+vigila el `state.json` del launcher y lanza `spotify-theme.sh --if-stale`. El
+disparador es tonto a propósito —ese fichero se reescribe en **cada** arranque,
+haya actualización o no— y toda la decisión vive en el script.
+
+La señal de detección es binaria y no depende de fechas ni de versiones:
+spicetify **extrae** `Apps/xpui.spa` a un directorio `Apps/xpui/` y borra el
+`.spa`. Así que:
+
+| En el disco | Significa |
+|---|---|
+| `Apps/xpui/` | parcheado |
+| `Apps/xpui.spa` | recién salido del `.deb`, sin parchear |
+
+Nunca están los dos. Cuando salta, el script espera a que `spotify-launcher`
+termine de extraer (parchear un árbol a medio extraer deja Spotify en pantalla
+blanca), reaplica y te avisa por notificación de que reinicies Spotify.
+
+Todo esto va con `spicetify -n`: sin ese flag spicetify **reinicia Spotify al
+aplicar, y lo abre aunque estuviera cerrado**. Corriendo desde `wall.sh` y desde
+una unidad de systemd, eso significaría que cambiar de fondo de pantalla te
+puede abrir el reproductor.
+
+### Code - OSS
+
+**Sin instalar ninguna extensión.** VS Code deja repintar cualquier elemento de
+su interfaz desde `workbench.colorCustomizations`, en el propio `settings.json`,
+y relee ese fichero en caliente: el editor abierto cambia de color solo.
+
+`code-theme.sh` funde las 101 claves que genera pywal con lo que ya tuvieras en
+`settings.json`, sin tocar el resto de tus ajustes. La primera vez fija también
+`workbench.colorTheme` a `Default Dark Modern` como base sobre la que pintar; si
+ya tenías un tema puesto, lo respeta.
+
+Se genera desde `colors-vscode-custom.json`, **no** desde el `colors-vscode.json`
+que trae pywal de serie: ese produce un tema completo que necesita una extensión
+que lo cargue.
+
+Una precaución dentro del script: `settings.json` admite comentarios (es JSONC) y
+`jq` no los entiende. Si algún día metes un `//` ahí, el script se planta y avisa
+en vez de destrozarte el fichero.
+
+### Zen Browser
+
+Zen es un fork de Firefox, así que se pinta con `userChrome.css`. Dos cosas hay
+que saber antes:
+
+**No usa las variables de Firefox.** `--toolbar-bgcolor`,
+`--tab-selected-bgcolor` y `--lwt-sidebar-background-color` no aparecen ni una
+vez en su `omni.ja`. Zen tiene su propio juego `--zen-*`. Los nombres de la
+plantilla salen de mirar el binario instalado, no de una guía:
+
+```bash
+unzip -p /opt/zen-browser-bin/browser/omni.ja | grep -o -- '--zen-[a-z-]*' | sort -u
+```
+
+Si Zen se actualiza y algo deja de pintarse, ese es el sitio donde mirar.
+
+**Hay que activar una pref o el CSS se ignora en silencio.** De eso y de enlazar
+el perfil se encarga `zen-apply`, que se ejecuta una vez:
+
+```bash
+~/.local/bin/zen-apply
+```
+
+Enlaza `chrome/userChrome.css` al fichero del caché, así que a partir de ahí cada
+cambio de fondo ya está ahí. Pero **el chrome no recarga en caliente**: entra al
+reiniciar el navegador.
+
+Zen tiene además su propio selector de color en ajustes. Si lo tocas ahí, puede
+pelearse con estas reglas.
+
 ### wlogout y swaync
 
 - **wlogout:** `layout` define los seis botones (etiqueta, acción, glifo, tecla) y
@@ -449,6 +829,68 @@ que es la forma comoda de probarlos sin bloquear la pantalla.
 > `hyprlock --grace 300` y cierra el proceso con `pkill hyprlock` desde otra
 > parte. El `grace` alto es la red de seguridad, porque durante esos segundos
 > cualquier tecla lo descarta sin contrasena.
+
+---
+
+## Juegos
+
+Esto no va de colores, va de que los juegos usen la tarjeta correcta.
+
+**Este portátil es Optimus muxless.** El panel lo pinta la Intel (`card2-eDP-2`,
+driver `i915`); el eDP de la NVIDIA está desconectado y `boot_vga` es la Intel.
+Consecuencia práctica: **un juego arranca en la UHD Graphics y no te avisa**. Lo
+único que notas es que va mal, y culpas al juego.
+
+Por eso, en las opciones de lanzamiento de cada juego en Steam:
+
+```
+prime-run gamemoderun mangohud %command%
+```
+
+`prime-run` (del paquete `nvidia-prime`) es lo no negociable: exporta
+`__NV_PRIME_RENDER_OFFLOAD=1`, `__GLX_VENDOR_LIBRARY_NAME=nvidia` y
+`__VK_LAYER_NV_optimus=NVIDIA_only`. Para OpenGL nativo es obligatorio o va en la
+Intel, seguro. Para Vulkan y Proton, DXVK *suele* preferir la GPU discreta, pero
+"suele" no es "siempre"; ese último flag esconde la Intel del enumerado y lo hace
+determinista.
+
+**Cómo comprobar que funcionó.** `~/.config/MangoHud/MangoHud.conf` arranca
+oculto y se conmuta con `Shift_R+F12`. Lleva `gpu_name` activado justo para esto:
+si ahí pone Intel, te falta el `prime-run`. También muestra el 1% low
+(`fps_metrics=avg,0.01`), que es el número que explica los tirones; la media
+miente.
+
+Sin lanzar ningún juego:
+
+```bash
+prime-run vulkaninfo --summary | grep deviceName    # necesita vulkan-tools
+```
+
+**GameMode hace menos de lo que promete aquí, y es a propósito.**
+`~/.config/gamemode.ini` deja el gobernador en paz (`desiredgov=powersave`): con
+`intel_pstate` en modo activo, "powersave" no es lento —sube a turbo bajo carga
+en milisegundos— mientras que "performance" clava `min_perf_pct` al 100% y en un
+chasis delgado le roba presupuesto térmico a la GPU, que es quien suele ser el
+cuello de botella. `renice`/`ioprio` van a 0 porque `gamemoded` corre como
+servicio de usuario con `RLIMIT_NICE` a 0 y no puede poner prioridades
+negativas; pedírselo solo llena el log.
+
+Lo que sí aporta, y es la única razón para entrar en el grupo `gamemode`, es
+**`split_lock_mitigate`**. El kernel lo trae a 1 y penaliza durísimo a los
+procesos que hacen atómicos desalineados, cosa que varios juegos de Windows bajo
+Proton hacen; se nota como tirones periódicos que ningún ajuste gráfico arregla.
+GameMode lo pone a 0 mientras juegas y lo restaura al salir, pero necesita
+permiso:
+
+```bash
+sudo usermod -aG gamemode $USER    # y cerrar sesión y volver a entrar
+gamemoded -t                       # debe decir "All Tests Passed!"
+```
+
+No hay sección `[gpu]` en el `.ini`: con `apply_gpu_optimisations` puesto a
+cualquier cosa que no sea la cadena literal `accept-responsibility`, gamemode
+escupe un ERROR y `gamemoded -t` falla. Sin la sección el comportamiento es el
+mismo (apagado) y sin ruido.
 
 ---
 
@@ -562,6 +1004,53 @@ wall ~/Pictures/wallpapers/loquesea.jpg   # cambia fondo y repinta todo
 recolor                                    # regenera la paleta del fondo actual
 ```
 
+### Aplicaciones Qt
+
+Sin instalar nada más, se comprueba con `qt6ct`: ábrelo, cambia de wallpaper y
+mira si la ventana se repinta un par de segundos después.
+
+Para verlo en negro sobre blanco, una app Qt6 de doce líneas que imprime la
+paleta que le llega:
+
+```bash
+cat > /tmp/pal.cpp <<'EOF'
+#include <QApplication>
+#include <QPalette>
+#include <cstdio>
+int main(int argc, char **argv) {
+    QApplication app(argc, argv);
+    printf("Window %s\n", app.palette().color(QPalette::Window).name().toUtf8().constData());
+    return 0;
+}
+EOF
+g++ -fPIC /tmp/pal.cpp -o /tmp/pal $(pkg-config --cflags --libs Qt6Widgets)
+QT_QPA_PLATFORM=offscreen /tmp/pal        # debe coincidir con color0 de la paleta
+```
+
+Si sale `#efefef`, el gris de fábrica de Qt, es que el plugin no está entrando:
+revisa `QT_QPA_PLATFORMTHEME` y luego `qt-apply`.
+
+### Steam, Spotify y Code - OSS
+
+```bash
+~/.config/hypr/scripts/steam-theme.sh   --status
+~/.config/hypr/scripts/spotify-theme.sh --status
+~/.config/hypr/scripts/code-theme.sh    --status
+```
+
+Los tres dicen qué pieza falta. Code debería decir `colores aplicados 101`.
+
+### Zen Browser
+
+```bash
+ls -l ~/.config/zen/*/chrome/userChrome.css   # tiene que ser un enlace al caché
+grep legacy ~/.config/zen/*/user.js           # y la pref tiene que estar
+```
+
+Si las dos cosas están y aun así no cambia, es que estás mirando otro perfil: ver
+[trampas](#trampas-y-hallazgos). Recuerda que ninguno de los dos programas repinta
+en caliente: hay que reabrirlos.
+
 ### Antes de commitear
 
 ```bash
@@ -608,7 +1097,7 @@ En las animaciones, `speed` **no** es velocidad: es la duración en décimas de
 segundo. `speed = 60` son 6 segundos. Un `speed = 1.2` en un `glowangle` con
 `style = "loop"` no es un giro lento: son 120 ms por vuelta, un estroboscopio.
 
-### Las plantillas de pywal pasan por `str.format()`
+### Las plantillas de pywal: llaves dobladas y funciones de color
 
 Cualquier llave literal en `~/.config/wal/templates/` hay que **duplicarla**:
 
@@ -617,9 +1106,35 @@ return {{        →  emite  return {
 ${{count}}       →  emite  ${count}
 ```
 
-Si no, `wal -R` peta con `KeyError` o se come la llave, y el fallo aparece luego
-en el programa consumidor, lejos de la causa. Ya mordió con `colors-hypr.lua` y
-con las variables de git de `starship.toml`.
+Ya mordió con `colors-hypr.lua`, con las variables de git de `starship.toml` y
+con el CSS de Steam, que es casi todo llaves.
+
+Dos matices que valen su peso en oro y que no están en la documentación de
+pywal, salidos de leer `pywal/export.py` de la versión instalada:
+
+1. **Ya no es `str.format()`.** pywal16 trae su propio analizador, y eso le da
+   una gramática que `str.format` no puede tener: `color '.' función(args)* '.'
+   propiedad`. O sea que esto funciona y ahorra escribir colores a mano:
+
+   ```
+   {color0.lighten(8)}          # aclara un 8 %
+   {color0.darken(50).rgb}      # oscurece y luego lo da como "r, g, b"
+   {color7.strip}               # hex sin almohadilla, para spicetify
+   {color0.hex_argb}            # #AARRGGBB, para Qt
+   ```
+
+   El montaje de Qt, Steam y Spotify se apoya entero en esto: de un `color0` y
+   un `color7` salen los quince tonos intermedios que piden esos formatos.
+
+2. **Un error de sintaxis solo tumba SU fichero**, no todos. `template()` hace
+   `return` en cuanto no puede analizar un marcador, así que el resto de
+   plantillas se generan igual. Peor todavía: el fichero de salida **se queda
+   con la versión anterior**, así que el síntoma es "esta app no cambia de
+   color" y no un error. Si algo deja de seguir la paleta, mira primero:
+
+   ```bash
+   wal -R -n -q -s -t -e 2>&1 | grep -i error
+   ```
 
 ### `color9`–`color15` suelen ser duplicados
 
@@ -647,6 +1162,96 @@ nombre `#353535`, el gris de fábrica.
 > Al verificar esto, **cuidado con dónde mides**: la vista de ficheros de Thunar
 > tiene su propio fondo, distinto del de la ventana. Medir ahí lleva a concluir
 > que el `@import` está roto cuando no lo está.
+
+### Qt: el vigilante mira el `.conf`, no el esquema
+
+`qt6ct` recarga en caliente, pero vigila `~/.config/qt6ct/qt6ct.conf` y **no** el
+fichero al que apunta `color_scheme_path`. Como nuestro `.conf` es estático y lo
+que cambia es el esquema del caché, regenerar la paleta no repintaba nada.
+
+La solución es un `touch` del `.conf` en `wall.sh`. Comprobado con una app Qt6
+mínima que imprimía `QPalette::Window` cada segundo mientras se cambiaba el
+esquema por debajo:
+
+```
+t=2s  se cambia colors-qt.conf     → sigue con el color viejo
+t=5s  touch qt6ct.conf             → sigue con el color viejo
+t=7s                                 entra el nuevo
+```
+
+Es decir: sin `touch` no entra nunca, y con `touch` tarda un par de segundos.
+
+Y tres ajustes de `qt6ct.conf` que son obligatorios, no preferencias:
+`style=Fusion` (los demás estilos aplican la paleta a medias),
+`custom_palette=true` (sin esto ignora la ruta) y la ruta **absoluta**, porque
+qt6ct no expande `~` ni `$HOME`. De ahí `qt-apply`.
+
+### Los nombres de las reglas de ventana cambian en la API Lua
+
+Las `windowrule` de toda la vida no se traducen solas. Y como
+`hl.window_rule` **sí** valida los campos, se puede preguntar sin miedo:
+
+```bash
+hyprctl eval 'hl.window_rule({ match = { class = "^(zzz)$" }, no_border = true })'
+# error: hl.window_rule: unknown field 'no_border'
+```
+
+Comprobado así, en 0.56.2:
+
+| Config clásica | API Lua |
+|---|---|
+| `stayfocused` | `stay_focused = true` |
+| `minsize 1 1` | `min_size = "1 1"` |
+| `idleinhibit fullscreen` | `idle_inhibit = "fullscreen"` |
+| `noblur`, `noshadow` | `no_blur`, `no_shadow` |
+| `noborder` | **no existe**: usa `border_size = 0` |
+| `content game` | **no existe** como `content_type` |
+
+Un campo inválido aborta la regla entera, no solo ese campo. Y un
+`hyprctl reload` limpia lo que hayas metido con `eval`, así que probar es gratis.
+
+### `profiles.ini` de Firefox: manda `[Install]`, no `Default=1`
+
+`zen-apply` enganchó el CSS al perfil equivocado a la primera. En este equipo
+`profiles.ini` tiene dos perfiles:
+
+```ini
+[Profile1]
+Path=3xhn7edd.Default Profile
+Default=1                          ← vacío, nunca se ha abierto
+
+[Install15B76BAA26BA15E7]
+Default=q2d7lhxs.Default (release) ← este es el que abre el navegador
+```
+
+El `Default=1` de un `[ProfileN]` es el mecanismo antiguo. Lo que decide qué
+perfil abre **esta instalación** es la clave `Default=` de la sección
+`[InstallXXXX]`. Fiarse del primero engancha el `userChrome.css` a un perfil que
+el navegador no abre nunca, y el síntoma es que no pasa absolutamente nada: ni un
+error, ni un aviso.
+
+`zen-apply` mira las tres cosas en orden: `[Install]`, luego el perfil que tenga
+`prefs.js` (o sea, el que se ha usado alguna vez) y por último el primero.
+
+Y la pref: sin
+`toolkit.legacyUserProfileCustomizations.stylesheets = true`, Firefox y todos sus
+forks **ignoran `userChrome.css` sin decir nada**. Se pone en `user.js` y no en
+`prefs.js`, porque `prefs.js` lo reescribe el navegador al cerrarse: editarlo con
+Zen abierto no sirve de nada.
+
+### pywal procesa TODO lo que haya en `templates/`
+
+Incluidos los `.bak`. Había un `colors-hypr.lua.bak` en la carpeta de plantillas
+y pywal le estaba generando religiosamente su `~/.cache/wal/colors-hypr.lua.bak`
+en cada cambio de fondo. No rompe nada, pero ensucia el caché y confunde. La
+carpeta de plantillas es solo para plantillas.
+
+### `millennium-steam-patcher` no existe
+
+Circula mucho ese nombre para el inyector de temas de Steam. En el AUR el
+paquete es **`millennium`** (o `millennium-bin`, en beta). Además compila desde
+fuente con `bun`, `rust` y `cmake`. Por eso aquí se usa el instalador oficial de
+Adwaita-for-Steam, que es lo que el propio proyecto recomienda.
 
 ### hyprlock: `grace` y `no_fade_in` no son opciones de config
 
@@ -715,10 +1320,10 @@ los valores por defecto (perfil y colección de escenas «Untitled»). Cuando te
 escenas de verdad, merece la pena añadir `global.ini`, `user.ini` y
 `basic/scenes/` — pero nunca `plugin_config/obs-websocket/`.
 
-**Qt está sin configurar.** `QT_QPA_PLATFORMTHEME=qt6ct` está puesto en
-`hyprland.lua`, pero no existen ni `~/.config/qt6ct` ni `~/.config/Kvantum`, así
-que las aplicaciones Qt van con su aspecto por defecto y no siguen la paleta. Es
-el equivalente Qt del agujero que tenía GTK.
+**Qt ya está resuelto.** `~/.config/qt5ct/qt5ct.conf` y
+`~/.config/qt6ct/qt6ct.conf` se versionan y apuntan al esquema que genera pywal;
+`qt-apply` arregla la ruta absoluta al desplegar. `Kvantum` sigue instalado pero
+sin usar: sobra teniendo `style=Fusion` con paleta personalizada.
 
 ---
 
@@ -732,6 +1337,19 @@ regeneran con el alias `pkglist`.
 
 **Utilidades:** `cliphist` `wl-clipboard` `grim` `slurp` `playerctl`
 `brightnessctl` `thunar` `starship` `btop` `cava` `fastfetch` `imagemagick` `jq`
+
+**Tematizado de toolkits:** `qt5ct` `qt6ct` (el puente de la paleta a las apps
+Qt). `kvantum` está instalado pero **no se usa**: con `style=Fusion` y paleta
+personalizada sobra.
+
+**Opcionales, para Steam y Spotify:** `steam` más el repo
+[Adwaita-for-Steam](https://github.com/tkashkin/Adwaita-for-Steam) clonado en
+`~/.local/share/adwaita-for-steam`; `spicetify-cli` (AUR) para Spotify. Si no
+están, los scripts salen sin hacer nada y el resto del sistema funciona igual.
+
+**Sin dependencias extra:** Code - OSS y Zen Browser se tematizan con lo que ya
+traen (`workbench.colorCustomizations` y `userChrome.css`). No hace falta ni una
+extensión ni `pywalfox`.
 
 **Fuentes:** `ttf-jetbrains-mono-nerd` (imprescindible: los glifos de waybar,
 wofi, wlogout, starship y fastfetch salen de ahí)

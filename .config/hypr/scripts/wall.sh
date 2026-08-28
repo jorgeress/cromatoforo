@@ -34,6 +34,22 @@ pkill -SIGUSR2 waybar || waybar & disown        # waybar recarga estilos
 swaync-client --reload-css || true              # centro de notificaciones
 pkill -SIGUSR1 kitty || true                    # kitty relee colores en caliente
 
+# Qt (qt6ct): el plugin vigila ~/.config/qt6ct/qt6ct.conf, NO el esquema de
+# color al que apunta. Regenerar colors-qt.conf no repinta nada; hay que
+# tocar el .conf para que el watcher se entere. Comprobado con una app Qt6
+# de prueba: sin touch la paleta no se movia; con touch entra 1-2 s despues.
+touch "${HOME}/.config/qt6ct/qt6ct.conf" 2>/dev/null || true
+
+# Steam y Spotify: no son GTK ni Qt, hay que parchearlos aparte. Los dos
+# scripts salen sin hacer nada si el programa no esta instalado, y ninguno
+# reinicia la aplicacion por su cuenta (ver los comentarios de cada uno).
+"${HOME}/.config/hypr/scripts/steam-theme.sh"   >/dev/null 2>&1 &
+"${HOME}/.config/hypr/scripts/spotify-theme.sh" >/dev/null 2>&1 &
+
+# Code - OSS: funde los colores en settings.json. VS Code relee ese fichero
+# en caliente, asi que el editor abierto se repinta solo.
+"${HOME}/.config/hypr/scripts/code-theme.sh" >/dev/null 2>&1 &
+
 # Consumidores que NO necesitan recarga explicita aqui:
 #   starship  -> STARSHIP_CONFIG apunta a ~/.cache/wal/starship.toml y starship
 #                relee el fichero en cada prompt, asi que entra solo.
@@ -47,6 +63,14 @@ pkill -SIGUSR1 kitty || true                    # kitty relee colores en calient
 #                highlighting) se lee al abrir la shell. Las terminales ya
 #                abiertas conservan los colores viejos de los plugins; el
 #                resto del tema (fondo, paleta ANSI, prompt) si cambia.
+#   steam     -> el CSS entra al arrancar el cliente. NO se reinicia solo:
+#                steam-theme.sh --restart lo hace a mano cuando quieras.
+#   spotify   -> igual. spotify-theme.sh solo aplica si Spotify esta cerrado;
+#                --force lo aplica de todas formas.
+#   zen       -> chrome/userChrome.css es un enlace a ~/.cache/wal/colors-zen.css,
+#                asi que la paleta nueva ya esta ahi. Pero Firefox y sus forks
+#                no recargan el CSS del chrome en caliente: entra al reiniciar
+#                el navegador. Enganchado una vez con `zen-apply`.
 
 # 4. Colores en terminales ya abiertas
 for tty in /dev/pts/*; do

@@ -1,0 +1,9 @@
+[Unit]
+Description=Reaplica el tema de pywal a Spotify si una actualizacion se lo llevo
+
+[Service]
+Type=oneshot
+ExecStart=%h/.config/hypr/scripts/spotify-theme.sh --if-stale
+# El script ya espera a que spotify-launcher termine de extraer (hasta 60 s)
+# antes de tocar el bundle; este margen es solo para no dejarlo colgado.
+TimeoutStartSec=300

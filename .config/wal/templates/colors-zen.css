@@ -1,0 +1,61 @@
+/* Autogenerado por pywal en ~/.cache/wal/colors-zen.css. NO editar a mano.
+ *
+ * Es el userChrome.css de Zen Browser. Lo enlaza en el perfil el script
+ * ~/.local/bin/zen-apply.
+ *
+ * POR QUE ESTAS VARIABLES Y NO LAS DE FIREFOX
+ *   Zen es un fork de Firefox pero NO se apoya en las variables clasicas:
+ *   --toolbar-bgcolor, --tab-selected-bgcolor y --lwt-sidebar-background-color
+ *   no aparecen ni una vez en su omni.ja. Tiene su propio juego --zen-*.
+ *   Los nombres de aqui salen de descomprimir el omni.ja de la version
+ *   instalada, no de una guia:
+ *       unzip -p /opt/zen-browser-bin/browser/omni.ja | grep -- '--zen-'
+ *   Si Zen se actualiza y algo deja de pintarse, ese es el sitio donde mirar.
+ *
+ * Las llaves van dobladas porque pywal hace {{ -> { al final.
+ */
+:root
+{{
+    /* Fondo general del navegador y de la barra de herramientas */
+    --zen-main-browser-background: {color0} !important;
+    --zen-main-browser-background-toolbar: {color0} !important;
+    --zen-themed-toolbar-bg: {color0.lighten(6)} !important;
+    --zen-themed-toolbar-bg-transparent: {color0} !important;
+
+    /* Acento: pestana activa, indicadores, foco */
+    --zen-primary-color: {color4} !important;
+    --zen-colors-primary: {color4} !important;
+    --zen-colors-secondary: {color0.lighten(10)} !important;
+    --zen-colors-tertiary: {color0.lighten(16)} !important;
+    --zen-colors-border: {color0.lighten(20)} !important;
+
+    /* Barra de direcciones */
+    --zen-urlbar-background: {color0.lighten(8)} !important;
+    --zen-urlbar-background-base: {color0.lighten(8)} !important;
+
+    /* Variables estandar que Zen si usa */
+    --lwt-accent-color: {color0} !important;
+    --lwt-text-color: {color7} !important;
+    --toolbar-color: {color7} !important;
+    --toolbar-field-background-color: {color0.lighten(8)} !important;
+    --toolbar-field-focus-background-color: {color0.lighten(12)} !important;
+    --toolbar-field-color: {color7} !important;
+    --toolbar-field-focus-color: {color7} !important;
+    --arrowpanel-background: {color0.lighten(10)} !important;
+    --arrowpanel-color: {color7} !important;
+    --arrowpanel-border-color: {color0.lighten(20)} !important;
+
+    /* Texto y bordes de uso general */
+    --zen-branding-bg: {color0} !important;
+    --button-background-color: {color0.lighten(10)} !important;
+    --button-text-color: {color7} !important;
+    --focus-outline-color: {color4} !important;
+}}
+
+/* La pagina de nueva pestana y el fondo del contenido, para que no de un
+ * fogonazo blanco al abrir una pestana. */
+#tabbrowser-tabpanels,
+#browser
+{{
+    background-color: {color0} !important;
+}}

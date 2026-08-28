@@ -1,11 +1,11 @@
 cbonsai
 cmatrix-git
 davinci-resolve
-localsend-bin
 paru
 paru-debug
 pipes.sh
 python-pywal16
+spicetify-cli
 ttf-ms-fonts
 tty-clock
 unimatrix-git

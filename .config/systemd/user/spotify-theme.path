@@ -1,0 +1,14 @@
+[Unit]
+Description=Vigila si una actualizacion de Spotify se llevo el tema de pywal
+Documentation=file:///home/j0r/.config/hypr/scripts/spotify-theme.sh
+
+[Path]
+# spotify-launcher reescribe state.json en CADA arranque, haya actualizacion o
+# no. Es un disparador tonto a proposito: barato, y toda la decision de si hay
+# que hacer algo vive en `spotify-theme.sh --if-stale`, que compara el mtime de
+# Apps/xpui.spa con el sello de la ultima aplicacion.
+PathChanged=%h/.local/share/spotify-launcher/state.json
+Unit=spotify-theme.service
+
+[Install]
+WantedBy=default.target

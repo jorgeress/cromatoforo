@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# qt-apply — deja los ficheros de qt5ct/qt6ct apuntando al cache de pywal
+# de ESTE usuario. Hermano de gtk-apply: se ejecuta una vez tras desplegar
+# los dotfiles en una maquina nueva.
+#
+# Por que hace falta: qt6ct guarda color_scheme_path como ruta ABSOLUTA y no
+# expande ~ ni $HOME. El fichero versionado lleva la ruta del autor, asi que
+# en otra maquina (u otro usuario) hay que reescribirla o Qt se queda con su
+# paleta de fabrica sin decir nada.
+set -euo pipefail
+
+SCHEME="${HOME}/.cache/wal/colors-qt.conf"
+
+for f in "${HOME}/.config/qt5ct/qt5ct.conf" "${HOME}/.config/qt6ct/qt6ct.conf"; do
+    [ -f "$f" ] || { echo "  falta $f (¿desplegaste los dotfiles?)"; continue; }
+    sed -i "s|^color_scheme_path=.*|color_scheme_path=${SCHEME}|" "$f"
+    printf "  %-40s -> %s\n" "${f/#$HOME/\~}" "$(grep -m1 '^color_scheme_path=' "$f")"
+done
+
+if [ ! -f "$SCHEME" ]; then
+    echo
+    echo "  OJO: $SCHEME no existe todavia. Genera una paleta con:"
+    echo "      wal -i ~/Pictures/wallpapers/<algo>.jpg"
+fi
+
+echo
+echo "Recuerda: QT_QPA_PLATFORMTHEME=qt6ct lo exporta hyprland.lua, asi que"
+echo "las apps Qt6 lanzadas desde la sesion ya lo cogen. Las Qt5 sueltas"
+echo "necesitan QT_QPA_PLATFORMTHEME=qt5ct delante."

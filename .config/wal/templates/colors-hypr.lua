@@ -8,14 +8,17 @@ return {{
     c8 = "{color8}", c9 = "{color9}", c10 = "{color10}", c11 = "{color11}",
     c12 = "{color12}", c13 = "{color13}", c14 = "{color14}", c15 = "{color15}",
 
-    -- Formato rgba() de Hyprland: hex sin almohadilla + alpha
-    border_active_a = "rgba({color4.strip}ff)",
-    border_active_b = "rgba({color6.strip}ff)",
+    -- Formato rgba() de Hyprland: hex sin almohadilla + alpha.
+    -- El darken(50) es a proposito: con la paleta cruda el borde activo
+    -- y su glow tiraban demasiado del ojo. Sube o baja ESE numero (y el
+    -- alpha del glow) si quieres mas o menos brillo; no toques el cache.
+    border_active_a = "rgba({color4.darken(50).strip}ff)",
+    border_active_b = "rgba({color6.darken(50).strip}ff)",
     border_inactive = "rgba({color8.strip}66)",
     shadow          = "rgba({color0.strip}99)",
 
     -- Glow (0.56): halo de la ventana activa. Alpha manda la intensidad.
-    glow_a          = "rgba({color4.strip}cc)",
-    glow_b          = "rgba({color6.strip}cc)",
+    glow_a          = "rgba({color4.darken(50).strip}66)",
+    glow_b          = "rgba({color6.darken(50).strip}66)",
     glow_inactive   = "rgba({color8.strip}00)",
 }}

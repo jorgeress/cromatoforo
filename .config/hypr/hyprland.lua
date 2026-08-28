@@ -227,6 +227,48 @@ hl.window_rule({
     float = true, pin = true, size = "480 270", move = "100%-500 100%-300",
 })
 
+-- ── Steam ──────────────────────────────────────────────────────
+-- Steam es XWayland y se comporta fatal por defecto. Estas reglas son el
+-- equivalente en la API Lua de 0.56 a las windowrule clasicas del wiki:
+--     stayfocused, class:^(steam)$, title:^()$   ->  stay_focused
+--     minsize 1 1, class:^(steam)$, title:^()$   ->  min_size
+--
+-- El problema: los menus desplegables de Steam se abren como ventanas sin
+-- titulo y de tamano 0. Hyprland les quita el foco al soltar el raton y el
+-- menu desaparece antes de que puedas pulsar nada. stay_focused evita eso y
+-- min_size impide que nazcan con tamano cero.
+hl.window_rule({
+    name  = "steam-menus",
+    match = { class = "^(steam)$", title = "^()$" },
+    stay_focused = true,
+    min_size     = "1 1",
+})
+
+-- Ventanas auxiliares que Steam abre sin tamano util
+for _, t in ipairs({ "Friends List", "Steam Settings", "Special Offers" }) do
+    hl.window_rule({ match = { class = "^(steam)$", title = "^(" .. t .. ")$" }, float = true })
+end
+
+-- Arrastrar y soltar entre ventanas XWayland (no es exclusivo de Steam, pero
+-- es donde mas se nota). Sale del ejemplo oficial de /usr/share/hypr/hyprland.lua.
+hl.window_rule({
+    name  = "fix-xwayland-drags",
+    match = { class = "^$", title = "^$", xwayland = true, float = true, fullscreen = false, pin = false },
+    no_focus = true,
+})
+
+-- ── Juegos ─────────────────────────────────────────────────────
+-- Sin blur ni sombras (cuestan frames) y sin que hypridle apague la pantalla
+-- en una cinematica larga. content = "game" lo marca el propio cliente.
+hl.window_rule({
+    name  = "juegos",
+    match = { fullscreen = true, xwayland = true },
+    no_blur      = true,
+    no_shadow    = true,
+    rounding     = 0,
+    idle_inhibit = "fullscreen",
+})
+
 -- Blur para la barra y el launcher
 -- ignore_alpha: solo se difumina lo que tenga alpha >= 0.5 (las islas, 0.75).
 -- Los huecos vacios de la barra (transparentes) dejan ver el fondo limpio.

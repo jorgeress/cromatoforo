@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+# zen-apply — engancha Zen Browser a la paleta de pywal.
+#
+# Hermano de gtk-apply y qt-apply: se ejecuta UNA vez tras desplegar los
+# dotfiles. A partir de ahi el color cambia solo con cada wallpaper.
+#
+# Que hace:
+#   1. Encuentra el perfil en uso leyendo profiles.ini (el nombre del
+#      directorio lleva un prefijo aleatorio distinto en cada maquina, por eso
+#      no se puede versionar una ruta fija).
+#
+#      TRAMPA: manda la clave Default= de la seccion [InstallXXXX], NO el
+#      Default=1 que puede aparecer bajo un [ProfileN]. Aqui habia dos
+#      perfiles y el marcado con Default=1 estaba vacio: el bueno era el que
+#      apuntaba [Install15B76BAA26BA15E7]. Fiarse del Default=1 engancha el
+#      CSS a un perfil que el navegador no abre nunca, y el sintoma es
+#      "no pasa nada" sin ningun error.
+#   2. Enlaza chrome/userChrome.css -> ~/.cache/wal/colors-zen.css. Al ser un
+#      enlace, cada `wal` repinta el navegador sin volver a pasar por aqui.
+#   3. Activa toolkit.legacyUserProfileCustomizations.stylesheets via user.js.
+#      Sin esa pref, Firefox y sus forks IGNORAN userChrome.css en silencio.
+#
+# Por que user.js y no prefs.js: prefs.js lo reescribe el navegador al cerrar,
+# asi que editarlo con Zen abierto no sirve de nada. user.js se aplica en cada
+# arranque y gana.
+#
+# Los cambios entran al REINICIAR Zen. No hay recarga en caliente del chrome.
+set -euo pipefail
+
+ZEN_DIR="${HOME}/.config/zen"
+CSS="${HOME}/.cache/wal/colors-zen.css"
+
+[ -d "$ZEN_DIR" ] || { echo "No encuentro ~/.config/zen. ¿Has abierto Zen alguna vez?"; exit 1; }
+
+INI="${ZEN_DIR}/profiles.ini"
+
+# 1a preferencia: el Default= de la seccion [Install...], que es la que dice
+# que perfil abre de verdad esta instalacion.
+PROFILE="$(awk -F= '
+    /^\[Install/ { inst=1; next }
+    /^\[/        { inst=0 }
+    inst && /^Default=/ { sub(/^Default=/,""); print; exit }
+' "$INI" 2>/dev/null)"
+
+# 2a: el perfil que tenga prefs.js, o sea el que se ha usado alguna vez.
+if [ -z "$PROFILE" ] || [ ! -d "${ZEN_DIR}/${PROFILE}" ]; then
+    while IFS= read -r cand; do
+        [ -f "${ZEN_DIR}/${cand}/prefs.js" ] && { PROFILE="$cand"; break; }
+    done < <(awk -F= '/^Path=/ {sub(/^Path=/,""); print}' "$INI" 2>/dev/null)
+fi
+
+# 3a: el primero que haya.
+[ -n "${PROFILE:-}" ] || PROFILE="$(awk -F= '/^Path=/ {sub(/^Path=/,""); print; exit}' "$INI")"
+
+DIR="${ZEN_DIR}/${PROFILE}"
+[ -d "$DIR" ] || { echo "El perfil '${PROFILE}' de profiles.ini no existe en disco"; exit 1; }
+echo "Perfil: ${DIR/#$HOME/\~}"
+
+mkdir -p "${DIR}/chrome"
+ln -sfn "$CSS" "${DIR}/chrome/userChrome.css"
+echo "  userChrome.css -> ${CSS/#$HOME/\~}"
+
+PREF='user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);'
+if ! grep -qF "legacyUserProfileCustomizations" "${DIR}/user.js" 2>/dev/null; then
+    echo "$PREF" >> "${DIR}/user.js"
+    echo "  pref añadida a user.js"
+else
+    echo "  pref ya estaba en user.js"
+fi
+
+[ -f "$CSS" ] || echo "  OJO: $CSS no existe. Lanza 'wal -R' o cambia de wallpaper."
+echo
+echo "Reinicia Zen para verlo. Zen tiene ademas su propio selector de color en"
+echo "ajustes: si lo tocas ahi, puede pelearse con estas reglas."
