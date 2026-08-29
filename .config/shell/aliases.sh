@@ -316,6 +316,11 @@ fflogos() {
 # Colores de pywal en cada terminal nueva
 [ -f "$HOME/.cache/wal/sequences" ] && (cat "$HOME/.cache/wal/sequences" &)
 
+# Colores de fzf y eza. Generado por pywal desde
+# ~/.config/wal/templates/shell-tools.sh. Entra en shells NUEVAS, igual que
+# los plugins de zsh: fzf lee FZF_DEFAULT_OPTS al arrancar y eza EZA_COLORS.
+[ -f "$HOME/.cache/wal/shell-tools.sh" ] && . "$HOME/.cache/wal/shell-tools.sh"
+
 # Qué shell está corriendo AHORA. Ojo: $SHELL es el del /etc/passwd, no
 # este; usarlo aquí rompía bash en cuanto zsh pasó a ser el login shell.
 if   [ -n "${ZSH_VERSION:-}" ];  then _cur_shell=zsh

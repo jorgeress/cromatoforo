@@ -28,6 +28,18 @@ awww img "$WALL" \
 # 2. Generar la paleta (esto escribe todos los ~/.cache/wal/*)
 wal -i "$WALL" -n -q
 
+# 2b. Comprobar que TODAS las plantillas se regeneraron.
+#
+# pywal aborta un fichero entero, sin escribirlo, cuando encuentra un {...}
+# que no sabe parsear (por ejemplo un "a { color: red }" de CSS en linea, cuyo
+# contenido no empieza por letra). Eso deja el fichero ANTERIOR en su sitio y
+# solo lo dice por logging, que aqui va a /dev/null. O sea que sin esto te
+# quedas con la paleta vieja en una aplicacion y no te enteras.
+#
+# El comprobador compara la fecha de cada fichero del cache con la de
+# ~/.cache/wal/colors, que pywal reescribe siempre. Avisa por notificacion.
+"${HOME}/.config/hypr/scripts/theme-status.sh" --templates || true
+
 # 3. Recargar cada consumidor de la paleta
 hyprctl reload >/dev/null                       # Hyprland relee colors-hypr.lua
 pkill -SIGUSR2 waybar || waybar & disown        # waybar recarga estilos

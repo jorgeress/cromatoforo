@@ -60,6 +60,7 @@ wallpaper.jpg
                       ├── colors-kitty.conf    → kitty               (include)
                       ├── starship.toml        → starship            (STARSHIP_CONFIG)
                       ├── zsh-colors.zsh       → plugins de zsh      (source en .zshrc)
+                      ├── shell-tools.sh       → fzf y eza           (source en aliases.sh)
                       ├── pywal.theme          → btop                (enlace simbólico)
                       ├── cava-config          → cava                (enlace simbólico)
                       ├── colors-qt.conf       → qt5ct/qt6ct → OBS y
@@ -133,6 +134,7 @@ Estado real, comprobado en este equipo. Nada de "debería funcionar".
 | btop | al arrancar | el tema es un enlace al caché |
 | cava | al pulsar `c` o al arrancar | no acepta señales de recarga |
 | plugins de zsh | en shells nuevas | `.zshrc` sourcea el caché al abrir |
+| **fzf** y **eza** | en shells nuevas | `aliases.sh` sourcea el caché; fzf lee `FZF_DEFAULT_OPTS` y eza `EZA_COLORS` al arrancar |
 | **Steam** | al arrancar el cliente | CSS inyectado en `steamui/`, no recarga en caliente |
 | **Spotify** | tras `spicetify apply` y reabrir | hay que reparchear el bundle de Electron |
 | **Zen Browser** | al reiniciar el navegador | Firefox y sus forks no recargan el CSS del chrome en caliente |
@@ -179,19 +181,12 @@ dot checkout
 # 4. Que 'dot status' no liste los miles de ficheros sin versionar del home
 dot config status.showUntrackedFiles no
 
-# 5. Los ajustes que viven en dconf y no se pueden versionar
-~/.local/bin/gtk-apply
+# 5. Todo lo mecánico de una vez: dconf de GTK, la ruta absoluta de Qt, el
+#    userChrome de Zen y el vigilante de Spotify. Es idempotente, y con
+#    --dry-run te dice qué haría sin tocar nada.
+~/.local/bin/dotfiles-bootstrap
 
-# 5b. Qt: reescribe la ruta absoluta del esquema de color para ESTE usuario.
-#     qt6ct no expande ~ ni $HOME, así que sin esto las apps Qt se quedan
-#     con su gris de fábrica y no avisan de nada.
-~/.local/bin/qt-apply
-
-# 5c. Zen Browser: enlaza el userChrome del perfil (el nombre del directorio
-#     de perfil es aleatorio, por eso no se puede versionar la ruta).
-~/.local/bin/zen-apply
-
-# 6. Paquetes
+# 6. Paquetes (o `dotfiles-bootstrap --paquetes`, que hace estos dos)
 sudo pacman -S --needed - < ~/.config/pkglists/pkgs-repo.txt
 paru -S --needed - < ~/.config/pkglists/pkgs-aur.txt
 
@@ -206,6 +201,9 @@ awww-daemon &
 # 8. Opcional: Steam y Spotify (ver sus apartados en Personalización)
 ~/.config/hypr/scripts/steam-theme.sh   --status
 ~/.config/hypr/scripts/spotify-theme.sh --status
+
+# 9. Comprobarlo todo de una vez
+~/.config/hypr/scripts/theme-status.sh
 ```
 
 El alias definitivo (`dot`, más `dots`, `dota`, `dotc`, `dotp`, `dotl`) ya viene
@@ -229,6 +227,7 @@ pérdida con `dot checkout -f`.
 │       ├── wallpicker.sh     selector visual de fondos (wofi con miniaturas)
 │       ├── steam-theme.sh    inyecta la paleta en el cliente de Steam
 │       ├── spotify-theme.sh  inyecta la paleta en Spotify (spicetify)
+│       ├── theme-status.sh   dice de un vistazo si el tematizado esta entero
 │       ├── code-theme.sh     funde la paleta en el settings.json de Code
 │       ├── hyprlock-test.sh  prueba hyprlock en headless, nunca en tu sesion
 │       ├── hyprlock-rescue.sh rescate si hyprlock se queda colgado
@@ -261,7 +260,8 @@ pérdida con `dot checkout -f`.
 ├── widgets                   eye candy propio
 ├── gtk-apply                 reaplica los ajustes GTK que viven en dconf
 ├── qt-apply                  arregla la ruta absoluta del esquema Qt
-└── zen-apply                 engancha el perfil de Zen al userChrome de pywal
+├── zen-apply                 engancha el perfil de Zen al userChrome de pywal
+└── dotfiles-bootstrap        deja una maquina recien clonada lista
 .zshenv       lee env.sh; se ejecuta siempre, hasta en scripts
 .zprofile     login: arranca Hyprland en la tty1
 .zshrc        opciones, historia, completado, teclas, plugins
@@ -925,7 +925,25 @@ mismo (apagado) y sin ruido.
 
 Regla general: **mirar el resultado, no suponerlo**. Casi todo aquí falla en
 silencio: GTK cae al tema claro sin avisar, hyprlock ignora una opción
-inexistente sin más, pywal se come una llave. Comprobar cuesta diez segundos.
+inexistente sin más, pywal se come una llave, eza descarta un color en hex sin
+rechistar. Comprobar cuesta diez segundos.
+
+### Lo primero: `theme-status.sh`
+
+```bash
+~/.config/hypr/scripts/theme-status.sh
+```
+
+Recorre las trece plantillas, los enlaces de btop y cava, el `@import` de GTK,
+la ruta absoluta de Qt, el `userChrome` de Zen con su pref, el parcheo de Steam
+y de Spotify con su vigilante, y los colores de Code - OSS. Sale con código
+distinto de cero si algo falla, así que sirve dentro de un script.
+
+Existe porque `wall.sh` lanza los themers en segundo plano y con la salida a
+`/dev/null`. Eso está bien (no quieres ruido en cada `SUPER+W`) pero significa
+que un themer roto falla **en silencio y para siempre**. Pasó de verdad:
+`steam-theme.sh` lanzaba el instalador sin ponerse en su directorio y reventaba
+entero sin que se notara nada.
 
 ### Hyprland (`hyprland.lua`)
 
@@ -1157,11 +1175,52 @@ pywal, salidos de leer `pywal/export.py` de la versión instalada:
    `return` en cuanto no puede analizar un marcador, así que el resto de
    plantillas se generan igual. Peor todavía: el fichero de salida **se queda
    con la versión anterior**, así que el síntoma es "esta app no cambia de
-   color" y no un error. Si algo deja de seguir la paleta, mira primero:
+   color" y no un error.
 
-   ```bash
-   wal -R -n -q -s -t -e 2>&1 | grep -i error
-   ```
+   Pero no toda llave rompe, y la diferencia importa. Probado a propósito:
+
+   | En la plantilla | Qué pasa |
+   |---|---|
+   | `a { color: red }` (CSS en línea) | El contenido no empieza por letra, no parsea: **aborta el fichero entero** |
+   | `{noexiste}` | Parsea pero el color no existe: lo deja literal y **sigue** |
+   | `{` suelta, sin cerrar | No casa con el regex, pasa tal cual, **no rompe nada** |
+
+   O sea que el peligro de verdad es meter CSS con llaves en la misma línea.
+   Ya no hace falta acordarse de comprobarlo: `wall.sh` llama a
+   `theme-status.sh --templates` después de cada `wal`, que compara la fecha de
+   cada fichero del caché con la de `~/.cache/wal/colors` y te avisa por
+   notificación de las que no se regeneraron.
+
+### eza ignora los colores en hex sin decir nada
+
+`EZA_COLORS` **no acepta `#RRGGBB`**. Y no se queja: simplemente no colorea.
+
+```
+EZA_COLORS="da=#ff0000"        →  root 19 ago 21:17          (sin un solo escape)
+EZA_COLORS="da=38;2;255;0;0"   →  root ^[[38;2;255;0;0m19 ago 21:17^[[0m
+```
+
+Hay que darle ANSI `38;2;R;G;B`. Como pywal solo sabe emitir `"R,G,B"` con
+comas, `shell-tools.sh` monta la cadena entera y le pasa un `tr ',' ';'`: un
+único subshell al abrir la shell en vez de ocho.
+
+fzf sí acepta hex, así que en el mismo fichero conviven los dos formatos.
+
+### En zsh, `$var:t` no es texto: es un modificador
+
+Al escribir la plantilla de eza, esto reventaba solo en zsh:
+
+```sh
+_wal_eza="$_wal_eza:tr=38;2;153,149,133"     # zsh: bad substitution
+```
+
+zsh lee `:t` como su modificador de parámetro (la cola de una ruta), y lo mismo
+con `:r`, `:u`, `:h`, `:a`, `:e`... que son casi todas las claves de eza. La
+solución es rodear el nombre de llaves, `${_wal_eza}`.
+
+Y ahí se cruzan las dos trampas de este README: esas llaves hay que **doblarlas
+en la plantilla** para que pywal las deje pasar. En `shell-tools.sh` se ve
+`${{_wal_eza}}`, que genera `${_wal_eza}`, que es lo que zsh entiende.
 
 ### `color9`-`color15` suelen ser duplicados
 

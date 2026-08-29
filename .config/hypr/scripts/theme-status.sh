@@ -1,0 +1,127 @@
+#!/usr/bin/env bash
+# theme-status.sh: dice de un vistazo si el tematizado esta entero.
+#
+# Uso:
+#   theme-status.sh              informe completo
+#   theme-status.sh --templates  solo las plantillas, callado salvo que falle
+#
+# POR QUE EXISTE
+#   wall.sh lanza los themers en segundo plano y con la salida a /dev/null:
+#
+#       "$HOME/.config/hypr/scripts/steam-theme.sh" >/dev/null 2>&1 &
+#
+#   Eso esta bien (no quieres ruido en cada cambio de fondo) pero significa que
+#   un themer roto falla en SILENCIO, en cada cambio, para siempre. Paso de
+#   verdad: steam-theme.sh lanzaba install.py sin ponerse en su directorio y
+#   reventaba entero sin que se notara.
+#
+#   Casi todo lo de aqui falla callado: pywal se come una plantilla con una
+#   llave suelta y te deja la anterior, eza ignora un color en hex sin decir
+#   nada, GTK cae al tema claro sin avisar. Comprobar cuesta un segundo.
+#
+# EL MODO --templates
+#   Lo llama wall.sh despues de generar la paleta. Compara la fecha de cada
+#   fichero del cache con la de ~/.cache/wal/colors, que pywal reescribe
+#   siempre. Si una plantilla es mas vieja, es que no se regenero: ahi tienes
+#   la llave suelta.
+set -uo pipefail
+
+CACHE="${HOME}/.cache/wal"
+TPL_DIR="${HOME}/.config/wal/templates"
+REF="${CACHE}/colors"
+FALLOS=0
+
+if [ -t 1 ]; then OK=$'\033[32mok\033[0m'; MAL=$'\033[31mMAL\033[0m'; NA=$'\033[90m-\033[0m'
+else OK="ok"; MAL="MAL"; NA="-"; fi
+
+linea() { printf "  %-26s %s\n" "$1" "$2"; }
+comprueba() { # nombre, condicion ya evaluada (0/1), detalle
+    if [ "$2" -eq 0 ]; then linea "$1" "$OK${3:+  $3}"
+    else linea "$1" "$MAL${3:+  $3}"; FALLOS=$((FALLOS+1)); fi
+}
+
+# ── plantillas ───────────────────────────────────────────────
+plantillas_rancias() {
+    [ -f "$REF" ] || { echo "SIN-PALETA"; return; }
+    local ref_t; ref_t=$(stat -c %Y "$REF")
+    local malas=""
+    for tpl in "$TPL_DIR"/*; do
+        [ -f "$tpl" ] || continue
+        local n out; n=$(basename "$tpl"); out="${CACHE}/${n}"
+        if [ ! -f "$out" ] || [ "$(stat -c %Y "$out")" -lt "$ref_t" ]; then
+            malas="${malas}${malas:+ }${n}"
+        fi
+    done
+    echo "$malas"
+}
+
+if [ "${1:-}" = "--templates" ]; then
+    malas="$(plantillas_rancias)"
+    [ -z "$malas" ] && exit 0
+    notify-send -u critical -a pywal "Plantillas sin generar" \
+        "No se regeneraron: ${malas}. Suele ser una llave sin doblar." 2>/dev/null
+    echo "pywal no regenero: ${malas}" >&2
+    exit 1
+fi
+
+echo
+echo "PLANTILLAS DE PYWAL"
+n_tpl=$(find "$TPL_DIR" -maxdepth 1 -type f | wc -l)
+malas="$(plantillas_rancias)"
+if [ -z "$malas" ]; then comprueba "las $n_tpl generadas" 0 "paleta de $(date -d @"$(stat -c %Y "$REF")" '+%d %b %H:%M')"
+else comprueba "sin regenerar" 1 "$malas"; fi
+
+echo
+echo "SE REPINTAN SOLOS"
+[ -L "$HOME/.config/btop/themes/pywal.theme" ]; comprueba "btop (enlace)" $?
+[ -L "$HOME/.config/cava/config" ];             comprueba "cava (enlace)" $?
+grep -q "cache/wal/colors-gtk.css" "$HOME/.config/gtk-3.0/gtk.css" 2>/dev/null
+comprueba "GTK3 (import)" $?
+grep -q "^color_scheme_path=$HOME/.cache/wal/colors-qt.conf" "$HOME/.config/qt6ct/qt6ct.conf" 2>/dev/null
+comprueba "Qt6 (color_scheme_path)" $?
+[ -f "$CACHE/shell-tools.sh" ] && grep -q "shell-tools.sh" "$HOME/.config/shell/aliases.sh"
+comprueba "fzf y eza" $? "en shells nuevas"
+
+echo
+echo "HAY QUE REABRIR EL PROGRAMA"
+# Zen: enlace al cache + la pref sin la cual Gecko ignora el userChrome
+ZEN="$HOME/.config/zen"
+if [ -f "$ZEN/profiles.ini" ]; then
+    PROF=$(awk -F= '/^Path=/ {sub(/^Path=/,""); print; exit}' "$ZEN/profiles.ini")
+    [ "$(readlink -f "$ZEN/$PROF/chrome/userChrome.css" 2>/dev/null)" = "$CACHE/colors-zen.css" ]
+    comprueba "Zen (userChrome)" $?
+    grep -qs "legacyUserProfileCustomizations.*true" "$ZEN/$PROF/prefs.js" "$ZEN/$PROF/user.js"
+    comprueba "Zen (pref legacy)" $? "sin esto lo ignora"
+else linea "Zen" "$NA  sin perfil"; fi
+
+# Steam: el instalador COPIA el css, no lo enlaza, asi que puede quedar viejo
+SUI="$HOME/.local/share/Steam/steamui"
+if [ -d "$SUI" ]; then
+    grep -q "Adwaita-for-Steam" "$SUI/css/library.css" 2>/dev/null
+    comprueba "Steam (parcheado)" $?
+    cmp -s "$CACHE/colors-steam.css" "$SUI/adwaita/custom.css"
+    comprueba "Steam (paleta al dia)" $? "si no: steam-theme.sh"
+else linea "Steam" "$NA  no instalado"; fi
+
+# Spotify: Apps/xpui/ = parcheado; Apps/xpui.spa = viene del .deb sin parchear
+SPO="$HOME/.local/share/spotify-launcher/install/usr/share/spotify"
+if [ -d "$SPO" ]; then
+    [ -d "$SPO/Apps/xpui" ]
+    comprueba "Spotify (parcheado)" $? "$([ -f "$SPO/Apps/xpui.spa" ] && echo 'una actualizacion se lo llevo')"
+    cmp -s "$CACHE/spicetify-color.ini" "$HOME/.config/spicetify/Themes/pywal/color.ini"
+    comprueba "Spotify (paleta al dia)" $?
+    vig=$(systemctl --user is-active spotify-theme.path 2>/dev/null) || true
+    [ "$vig" = "active" ]; comprueba "Spotify (vigilante)" $? "${vig:-desconocido}"
+else linea "Spotify" "$NA  no instalado"; fi
+
+echo
+echo "SE REPINTA EN CALIENTE"
+if [ -f "$HOME/.config/Code - OSS/User/settings.json" ]; then
+    n=$(grep -c '"#' "$HOME/.config/Code - OSS/User/settings.json" 2>/dev/null || echo 0)
+    [ "$n" -gt 50 ]; comprueba "Code - OSS" $? "$n colores"
+else linea "Code - OSS" "$NA  sin settings.json"; fi
+
+echo
+if [ "$FALLOS" -eq 0 ]; then echo "  todo en orden"; else echo "  $FALLOS cosa(s) que mirar"; fi
+echo
+exit $(( FALLOS > 0 ? 1 : 0 ))

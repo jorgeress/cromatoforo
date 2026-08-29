@@ -1,0 +1,114 @@
+#!/usr/bin/env bash
+# dotfiles-bootstrap: deja una maquina recien clonada lista para usar.
+#
+# Uso:
+#   dotfiles-bootstrap             lo que no necesita root ni cambia el sistema
+#   dotfiles-bootstrap --paquetes  ademas instala los paquetes de las listas
+#   dotfiles-bootstrap --dry-run   solo dice lo que haria
+#
+# QUE HACE Y QUE NO
+#   Hace lo mecanico y reversible: reescribir rutas absolutas, enlazar el
+#   userChrome de Zen, volcar los ajustes de dconf, habilitar el vigilante de
+#   Spotify. Todo eso es idempotente: lanzarlo dos veces no rompe nada.
+#
+#   NO hace, y lo dice al final para que lo lances tu: instalar paquetes (sin
+#   --paquetes), el chsh a zsh, y el tematizado de Steam y Spotify, que
+#   necesitan que esas aplicaciones esten instaladas y arrancadas una vez.
+#
+#   La razon es simple: un bootstrap que cambia tu shell de login o mete
+#   doscientos paquetes sin preguntar es un bootstrap que no te atreves a
+#   ejecutar. Prefiero uno aburrido que puedas lanzar sin pensarlo.
+#
+# LOS PASOS 1 A 4 NO ESTAN AQUI
+#   Clonar el repo y hacer el checkout es lo que pone este script en tu disco,
+#   asi que no puede hacerlo el. Estan en el README.
+set -uo pipefail
+
+DRY=0; PAQUETES=0
+for a in "$@"; do
+    case "$a" in
+        --dry-run)  DRY=1 ;;
+        --paquetes) PAQUETES=1 ;;
+        *) echo "opcion desconocida: $a"; exit 2 ;;
+    esac
+done
+
+paso()  { printf '\n\033[1m::\033[0m %s\n' "$1"; }
+haz()   { if [ "$DRY" = 1 ]; then printf '   [dry-run] %s\n' "$*"; else "$@"; fi; }
+salta() { printf '   \033[90mya estaba: %s\033[0m\n' "$1"; }
+
+paso "git: no listar los miles de ficheros del home"
+if [ "$(git --git-dir="$HOME/.dotfiles" config --get status.showUntrackedFiles 2>/dev/null)" = "no" ]; then
+    salta "showUntrackedFiles=no"
+else
+    haz git --git-dir="$HOME/.dotfiles" config status.showUntrackedFiles no
+fi
+
+paso "GTK: ajustes que viven en dconf y no se pueden versionar"
+[ -x "$HOME/.local/bin/gtk-apply" ] && haz "$HOME/.local/bin/gtk-apply" || echo "   falta gtk-apply"
+
+paso "Qt: reescribir la ruta absoluta del esquema para ESTE usuario"
+# qt6ct no expande ~ ni $HOME. Sin esto las apps Qt se quedan grises sin avisar.
+[ -x "$HOME/.local/bin/qt-apply" ] && haz "$HOME/.local/bin/qt-apply" || echo "   falta qt-apply"
+
+paso "Zen: enlazar el userChrome del perfil"
+# El nombre del directorio de perfil es aleatorio, por eso no se versiona.
+if [ -d "$HOME/.config/zen" ]; then
+    [ -x "$HOME/.local/bin/zen-apply" ] && haz "$HOME/.local/bin/zen-apply" || echo "   falta zen-apply"
+else
+    echo "   Zen no ha arrancado nunca todavia (no hay ~/.config/zen). Abrelo una vez y repite."
+fi
+
+paso "Spotify: vigilante que reaplica el tema tras cada actualizacion"
+# El enlace de default.target.wants es estado de systemd, no configuracion, asi
+# que no esta en el repo y hay que crearlo aqui.
+if [ -f "$HOME/.config/systemd/user/spotify-theme.path" ]; then
+    if [ "$(systemctl --user is-enabled spotify-theme.path 2>/dev/null)" = "enabled" ]; then
+        salta "spotify-theme.path habilitado"
+    else
+        haz systemctl --user enable --now spotify-theme.path
+    fi
+else
+    echo "   no esta la unidad; falta hacer checkout?"
+fi
+
+paso "Carpeta de fondos"
+if [ -d "$HOME/Pictures/wallpapers" ]; then salta "~/Pictures/wallpapers"
+else haz mkdir -p "$HOME/Pictures/wallpapers"; fi
+
+if [ "$PAQUETES" = 1 ]; then
+    paso "Paquetes de los repos"
+    haz sudo pacman -S --needed - < "$HOME/.config/pkglists/pkgs-repo.txt"
+    paso "Paquetes del AUR"
+    haz paru -S --needed - < "$HOME/.config/pkglists/pkgs-aur.txt"
+fi
+
+cat <<'FIN'
+
+── TE TOCA A TI ──────────────────────────────────────────────
+
+  Paquetes (si no lo lanzaste con --paquetes):
+      dotfiles-bootstrap --paquetes
+
+  zsh como shell de login (bash se queda para los scripts):
+      chsh -s /usr/bin/zsh
+
+  Primera paleta (mete antes alguna imagen en ~/Pictures/wallpapers):
+      awww-daemon &
+      ~/.config/hypr/scripts/wall.sh ~/Pictures/wallpapers/loquesea.jpg
+
+  Steam: abrelo UNA VEZ y cierralo, y luego:
+      git clone https://github.com/tkashkin/Adwaita-for-Steam.git \
+          ~/.local/share/adwaita-for-steam
+      ~/.config/hypr/scripts/steam-theme.sh --restart
+
+  Spotify:
+      paru -S spicetify-cli
+      ~/.config/hypr/scripts/spotify-theme.sh --force
+
+FIN
+
+if [ "$DRY" = 0 ] && [ -x "$HOME/.config/hypr/scripts/theme-status.sh" ]; then
+    echo "── COMO ESTA LA COSA AHORA ───────────────────────────────────"
+    "$HOME/.config/hypr/scripts/theme-status.sh" || true
+fi
