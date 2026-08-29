@@ -62,6 +62,16 @@ touch "${HOME}/.config/qt6ct/qt6ct.conf" 2>/dev/null || true
 # en caliente, asi que el editor abierto se repinta solo.
 "${HOME}/.config/hypr/scripts/code-theme.sh" >/dev/null 2>&1 &
 
+# Obsidian: hay que COPIAR el snippet dentro del vault, no vale enlazarlo. Su
+# vigilante mira el directorio del vault, y un enlace simbolico no cambia nunca
+# de metadatos por mucho que cambie el fichero al otro lado. Comprobado: con
+# enlace habia que recargar los snippets a mano.
+#
+# --refresh solo copia el CSS a los vaults YA enganchados. No toca
+# appearance.json a proposito: si Obsidian esta abierto podria pisarlo al
+# cerrarse, y esto corre en cada cambio de fondo.
+"${HOME}/.local/bin/obsidian-apply" --refresh >/dev/null 2>&1 &
+
 # Consumidores que NO necesitan recarga explicita aqui:
 #   starship  -> STARSHIP_CONFIG apunta a ~/.cache/wal/starship.toml y starship
 #                relee el fichero en cada prompt, asi que entra solo.

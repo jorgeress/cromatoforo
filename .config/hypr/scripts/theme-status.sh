@@ -127,7 +127,9 @@ if command -v lazygit >/dev/null 2>&1; then
 else linea "lazygit" "$NA  no instalado"; fi
 
 # Obsidian: el snippet vive DENTRO del vault, cuya ruta la elige el usuario, asi
-# que hay que preguntarle a obsidian-apply.
+# que hay que preguntarle a obsidian-apply. Se COPIA, no se enlaza (ver el
+# comentario de obsidian-apply), asi que lo que se comprueba es que el
+# contenido coincida con el del cache.
 if command -v obsidian >/dev/null 2>&1; then
     if [ -f "$HOME/.config/obsidian/obsidian.json" ]; then
         sal="$("$HOME/.local/bin/obsidian-apply" --status 2>/dev/null | grep -c "enlace=si activo=si")"

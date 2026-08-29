@@ -4,6 +4,7 @@
 # Uso:
 #   obsidian-apply              engancha todos los vaults conocidos
 #   obsidian-apply RUTA         engancha solo ese vault
+#   obsidian-apply --refresh    solo refresca el CSS de los vaults ya enganchados
 #   obsidian-apply --status     dice como esta la cosa
 #
 # POR QUE HACE FALTA UN SCRIPT
@@ -13,14 +14,30 @@
 #   ~/.config/obsidian/obsidian.json, asi que de ahi los sacamos.
 #
 # QUE HACE
-#   1. Enlaza <vault>/.obsidian/snippets/pywal.css al cache de pywal.
+#   1. COPIA el cache a <vault>/.obsidian/snippets/pywal.css.
 #   2. Activa el snippet escribiendo en <vault>/.obsidian/appearance.json, en
 #      la lista enabledCssSnippets. Sin ese paso el fichero esta pero apagado,
 #      y tendrias que ir a Ajustes -> Apariencia a darle al interruptor.
 #
+# POR QUE COPIA Y NO ENLAZA, QUE SERIA LO LOGICO
+#   Se probo con enlace simbolico y Obsidian NO se enteraba de los cambios:
+#   habia que recargar los snippets a mano. La causa es que su vigilante mira
+#   el DIRECTORIO del vault, y ahi lo unico que hay es un enlace cuyos
+#   metadatos no cambian nunca.
+#
+#   Y no es que el contenido no cambie: pywal escribe con open(...,"w"), o sea
+#   que trunca y reescribe EN EL MISMO INODO (comprobado). El fichero de
+#   destino cambia de verdad; lo que no cambia es el enlace. Copiando, el
+#   fichero que hay dentro del vault se modifica y el vigilante no tiene
+#   escapatoria.
+#
+#   Es la misma razon por la que Steam tampoco puede ir con enlace.
+#
 # LIMITE CONOCIDO
 #   Si Obsidian esta abierto cuando se toca appearance.json, puede
 #   sobrescribirlo al cerrarse. Cierra Obsidian antes, o reinicialo despues.
+#   Por eso --refresh NO toca appearance.json: se llama desde wall.sh en cada
+#   cambio de fondo y seria pedir problemas.
 set -uo pipefail
 
 CACHE="${HOME}/.cache/wal/obsidian.css"
@@ -47,7 +64,7 @@ engancha() {
     [ -d "$vault" ] || { echo "  no existe: $vault"; return 1; }
     local dir="${vault}/.obsidian/snippets"
     mkdir -p "$dir"
-    ln -sf "$CACHE" "${dir}/pywal.css"
+    cp -f "$CACHE" "${dir}/pywal.css"
 
     # Activar el snippet en appearance.json sin pisar el resto de ajustes.
     local ap="${vault}/.obsidian/appearance.json"
@@ -70,6 +87,17 @@ PY
     echo "  enganchado: $vault"
 }
 
+# Camino automatico (wall.sh): solo refresca el CSS de los vaults que YA estan
+# enganchados. Callado, y sin tocar appearance.json.
+if [ "$MODE" = "--refresh" ]; then
+    [ -f "$CACHE" ] || exit 0
+    vaults | while read -r v; do
+        d="${v}/.obsidian/snippets"
+        [ -f "${d}/pywal.css" ] && cp -f "$CACHE" "${d}/pywal.css"
+    done
+    exit 0
+fi
+
 if [ "$MODE" = "--status" ]; then
     printf "  %-22s %s\n" "paleta generada" "$([ -f "$CACHE" ] && echo si || echo NO)"
     if [ ! -f "$CONF" ]; then
@@ -78,7 +106,7 @@ if [ "$MODE" = "--status" ]; then
         exit 0
     fi
     vaults | while read -r v; do
-        ok=$([ "$(readlink -f "${v}/.obsidian/snippets/pywal.css" 2>/dev/null)" = "$CACHE" ] && echo si || echo NO)
+        ok=$(cmp -s "$CACHE" "${v}/.obsidian/snippets/pywal.css" 2>/dev/null && echo si || echo NO)
         on=$(grep -q '"pywal"' "${v}/.obsidian/appearance.json" 2>/dev/null && echo si || echo NO)
         printf "  %-22s enlace=%s activo=%s\n" "$(basename "$v")" "$ok" "$on"
     done

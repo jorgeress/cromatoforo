@@ -63,7 +63,7 @@ wallpaper.jpg
                       ├── shell-tools.sh       → fzf y eza           (source en aliases.sh)
                       ├── yazi-theme.toml      → yazi                (enlace simbólico)
                       ├── lazygit-config.yml   → lazygit             (enlace simbólico)
-                      ├── obsidian.css         → Obsidian            (snippet en el vault)
+                      ├── obsidian.css         → Obsidian            (copiado al vault)
                       ├── pywal.theme          → btop                (enlace simbólico)
                       ├── cava-config          → cava                (enlace simbólico)
                       ├── colors-qt.conf       → qt5ct/qt6ct → OBS y
@@ -143,7 +143,7 @@ Estado real, comprobado en este equipo. Nada de "debería funcionar".
 | **Zen Browser** | al reiniciar el navegador | Firefox y sus forks no recargan el CSS del chrome en caliente |
 | **yazi** | al reabrirlo | lee `theme.toml` al arrancar |
 | **lazygit** | al reabrirlo | lee `config.yml` al arrancar |
-| **Obsidian** | al reabrirlo | el snippet vive dentro del vault; lo engancha `obsidian-apply` |
+| **Obsidian** | al reabrirlo, o puede que en caliente | el snippet se **copia** dentro del vault (`obsidian-apply`); con enlace simbólico su vigilante no se enteraba |
 
 ### No sigue la paleta, y no es un descuido
 
