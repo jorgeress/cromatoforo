@@ -1,0 +1,6 @@
+# Configuracion propia de lazygit. Este fichero es SUYO: lazygit lo reescribe
+# solo cuando migra su esquema, asi que aqui NO puede haber nada generado por
+# pywal. Los colores van aparte, en ~/.cache/wal/lazygit-theme.yml, y los dos
+# se fusionan con LG_CONFIG_FILE (ver ~/.config/shell/env.sh).
+gui:
+  nerdFontsVersion: "3"

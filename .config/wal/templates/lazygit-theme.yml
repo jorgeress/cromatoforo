@@ -1,0 +1,58 @@
+# Autogenerado por pywal. NO editar a mano.
+# Fuente:  ~/.config/wal/templates/lazygit-theme.yml
+# Destino: ~/.cache/wal/lazygit-theme.yml
+#
+# AQUI SOLO VA EL TEMA, Y ES IMPORTANTE QUE SIGA SIENDO ASI.
+#
+#   Al principio esta plantilla era la configuracion ENTERA de lazygit,
+#   enlazada desde ~/.config/lazygit/config.yml, siguiendo el patron de
+#   cava-config y starship.toml. Fue un error, y este es el motivo:
+#
+#   lazygit ESCRIBE en su fichero de configuracion. Cuando cambia su esquema
+#   migra el fichero solo y lo guarda. Al ser un enlace al cache, esa migracion
+#   caia dentro del fichero generado, y el siguiente cambio de fondo lo
+#   regeneraba desde la plantilla con el esquema viejo. Resultado: aviso de
+#   migracion en CADA arranque, para siempre.
+#
+#   Paso de verdad: lazygit 0.64 movio git.paging a git.pagers, luego a
+#   git.diffRenderers.
+#
+#   Ahora estan separados. Los ajustes que lazygit puede querer reescribir
+#   viven en ~/.config/lazygit/config.yml, que es un fichero normal y suyo.
+#   Aqui solo hay colores, que lazygit no migra. Los dos se fusionan con
+#   LG_CONFIG_FILE, que se exporta en ~/.config/shell/env.sh. Este va el
+#   ultimo, asi que en caso de conflicto manda la paleta.
+#
+# SOBRE LOS COLORES: aqui SI se tematiza todo, al contrario que en eza o yazi.
+# lazygit usa ranuras semanticas (rojo sin preparar, verde activo) y la paleta
+# de pywal tambien las tiene, asi que mapear ranura contra ranura conserva el
+# significado.
+
+gui:
+  theme:
+    activeBorderColor:
+      - "{color4}"
+      - bold
+    inactiveBorderColor:
+      - "{color8}"
+    searchingActiveBorderColor:
+      - "{color3}"
+      - bold
+    optionsTextColor:
+      - "{color6}"
+    selectedLineBgColor:
+      - "{color8}"
+    inactiveViewSelectedLineBgColor:
+      - bold
+    cherryPickedCommitFgColor:
+      - "{color0}"
+    cherryPickedCommitBgColor:
+      - "{color5}"
+    markedBaseCommitFgColor:
+      - "{color0}"
+    markedBaseCommitBgColor:
+      - "{color3}"
+    unstagedChangesColor:
+      - "{color1}"
+    defaultFgColor:
+      - "{color7}"

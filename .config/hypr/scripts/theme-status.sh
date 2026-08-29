@@ -149,9 +149,13 @@ if command -v yazi >/dev/null 2>&1; then
     comprueba "yazi (enlace del tema)" $?
 else linea "yazi" "$NA  no instalado"; fi
 
+# lazygit NO va enlazado a proposito: el reescribe su config al migrar de
+# esquema, y si el fichero fuera el del cache la migracion se perderia en el
+# siguiente cambio de fondo. Van separados y se fusionan con LG_CONFIG_FILE.
 if command -v lazygit >/dev/null 2>&1; then
-    [ "$(readlink -f "$HOME/.config/lazygit/config.yml" 2>/dev/null)" = "$CACHE/lazygit-config.yml" ]
-    comprueba "lazygit (enlace)" $?
+    [ -f "$CACHE/lazygit-theme.yml" ] && [ -f "$HOME/.config/lazygit/config.yml" ] \
+        && grep -q "lazygit-theme.yml" "$HOME/.config/shell/env.sh" 2>/dev/null
+    comprueba "lazygit (tema + config)" $? "via LG_CONFIG_FILE"
 else linea "lazygit" "$NA  no instalado"; fi
 
 # Obsidian: el snippet vive DENTRO del vault, cuya ruta la elige el usuario, asi

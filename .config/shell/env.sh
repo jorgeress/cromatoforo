@@ -33,6 +33,15 @@ export MANPAGER='sh -c "col -bx | bat -l man -p"'
 # cambiar de wallpaper: por eso el prompt cambia de color solo.
 export STARSHIP_CONFIG="$HOME/.cache/wal/starship.toml"
 
+# lazygit fusiona varios ficheros de configuracion separados por comas, y el
+# ultimo manda. El primero es el suyo, que EL reescribe cuando migra su
+# esquema; el segundo lo genera pywal y solo lleva colores.
+#
+# Estan separados a proposito: cuando eran uno solo enlazado al cache, la
+# migracion de lazygit caia dentro del fichero generado y el siguiente cambio
+# de fondo la borraba, o sea aviso de migracion en cada arranque.
+export LG_CONFIG_FILE="$HOME/.config/lazygit/config.yml,$HOME/.cache/wal/lazygit-theme.yml"
+
 # ── XDG ─────────────────────────────────────────────────────
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_DATA_HOME="$HOME/.local/share"

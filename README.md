@@ -62,7 +62,7 @@ wallpaper.jpg
                       ├── zsh-colors.zsh       → plugins de zsh      (source en .zshrc)
                       ├── shell-tools.sh       → fzf y eza           (source en aliases.sh)
                       ├── yazi-theme.toml      → yazi                (enlace simbólico)
-                      ├── lazygit-config.yml   → lazygit             (enlace simbólico)
+                      ├── lazygit-theme.yml    → lazygit             (`LG_CONFIG_FILE`)
                       ├── obsidian.css         → Obsidian            (copiado al vault)
                       ├── pywal.theme          → btop                (enlace simbólico)
                       ├── cava-config          → cava                (enlace simbólico)
@@ -143,7 +143,7 @@ Estado real, comprobado en este equipo. Nada de "debería funcionar".
 | **Spotify** | tras `spicetify apply` y reabrir | hay que reparchear el bundle de Electron |
 | **Zen Browser** | al reiniciar el navegador | Firefox y sus forks no recargan el CSS del chrome en caliente |
 | **yazi** | al reabrirlo | lee `theme.toml` al arrancar |
-| **lazygit** | al reabrirlo | lee `config.yml` al arrancar |
+| **lazygit** | al reabrirlo | lee su config al arrancar. **No va enlazado**: ver la trampa de abajo |
 
 ### No sigue la paleta, y no es un descuido
 
@@ -1290,6 +1290,47 @@ Dos cosas más que muerden con libvirt en un portátil de un solo usuario:
    `user` y `group` a tu usuario en `/etc/libvirt/qemu.conf`. Rebaja la
    seguridad (una fuga de la VM aterriza con tus permisos), pero la alternativa
    es aflojar los permisos de tu carpeta personal, que es peor.
+
+### Nunca enlaces al caché un fichero que el programa reescribe
+
+lazygit dejó esto claro de golpe. Su configuración empezó siendo una plantilla
+de pywal enlazada desde `~/.config/lazygit/config.yml`, siguiendo el mismo
+patrón que `cava-config` y `starship.toml`. Y al primer arranque:
+
+```
+The user config file /home/j0r/.config/lazygit/config.yml must be migrated.
+- Moved git.paging object to git.pagers array
+- Renamed git.pagers to git.diffRenderers
+Config file saved successfully
+```
+
+**lazygit escribe en su fichero de configuración.** Al ser un enlace, esa
+migración cayó dentro del fichero generado en `~/.cache/wal/`. Y el siguiente
+`SUPER+W` lo habría regenerado desde la plantilla con el esquema viejo, así que
+lazygit volvería a migrar. Aviso en cada arranque, para siempre, y la migración
+perdiéndose cada vez.
+
+La regla que sale de aquí: **un fichero del caché de pywal solo puede enlazarse
+si el programa lo trata como de solo lectura.** btop, cava y yazi cumplen; leen
+al arrancar y no escriben nunca. lazygit no.
+
+El arreglo es separar lo que escribe cada uno:
+
+| | Quién manda |
+|---|---|
+| `~/.config/lazygit/config.yml` | lazygit. Fichero normal, versionado, que él puede migrar |
+| `~/.cache/wal/lazygit-theme.yml` | pywal. Solo colores, que lazygit no migra |
+
+Y se fusionan con la variable `LG_CONFIG_FILE`, que acepta una lista separada
+por comas y donde **manda el último**, o sea la paleta:
+
+```sh
+export LG_CONFIG_FILE="$HOME/.config/lazygit/config.yml,$HOME/.cache/wal/lazygit-theme.yml"
+```
+
+Comprobado que la variable se lee de verdad metiendo a propósito un YAML roto
+en la lista: lazygit sale con código 1 y el error de parseo. Sin esa prueba,
+"no dio error" no habría demostrado nada.
 
 ### eza ignora los colores en hex sin decir nada
 
