@@ -1,5 +1,5 @@
 #
-# ~/.bashrc — bash interactivo.
+# ~/.bashrc: bash interactivo.
 #
 # zsh es el shell de trabajo (ver ~/.zshrc). bash se queda para scripts
 # y como red de seguridad: si zsh se rompe, `bash -l` sigue dando un

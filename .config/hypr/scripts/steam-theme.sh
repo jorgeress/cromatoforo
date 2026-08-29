@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# steam-theme.sh — repinta el cliente de Steam con la paleta del wallpaper.
+# steam-theme.sh: repinta el cliente de Steam con la paleta del wallpaper.
 #
 # Uso:
 #   steam-theme.sh            aplica el tema (silencioso si Steam no esta)

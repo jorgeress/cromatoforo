@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# spotify-theme.sh — repinta Spotify con la paleta del wallpaper.
+# spotify-theme.sh: repinta Spotify con la paleta del wallpaper.
 #
 # Uso:
 #   spotify-theme.sh             copia la paleta; aplica solo si Spotify esta cerrado

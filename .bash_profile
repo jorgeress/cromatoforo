@@ -1,5 +1,5 @@
 #
-# ~/.bash_profile — login shell de bash.
+# ~/.bash_profile: login shell de bash.
 #
 # El autoarranque de Hyprland vive AQUÍ y en ~/.zprofile. Los dos, a
 # propósito: el login shell es zsh, pero si algún día vuelves a bash con

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# code-theme.sh — mete la paleta del wallpaper en Code - OSS.
+# code-theme.sh: mete la paleta del wallpaper en Code - OSS.
 #
 # Uso:
 #   code-theme.sh            funde los colores en settings.json

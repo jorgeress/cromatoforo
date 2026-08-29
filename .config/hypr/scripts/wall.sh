@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# wall.sh — cambia wallpaper y repinta TODO el sistema con su paleta.
+# wall.sh: cambia wallpaper y repinta TODO el sistema con su paleta.
 # Uso: wall.sh random | pick | restore | /ruta/a/imagen.jpg
 set -euo pipefail
 

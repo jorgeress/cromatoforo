@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# gtk-apply — reaplica los ajustes GTK que viven en dconf.
+# gtk-apply: reaplica los ajustes GTK que viven en dconf.
 #
 # Los ficheros ~/.config/gtk-3.0|4.0/{settings.ini,gtk.css} si estan en el
 # repo de dotfiles, pero estos valores los guarda dconf en un binario que no

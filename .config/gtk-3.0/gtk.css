@@ -1,7 +1,7 @@
 /* GTK3 con la paleta de pywal.
  *
  * OJO: redefinir los colores internos de Adwaita (@define-color
- * theme_bg_color ...) NO funciona en GTK 3.24.52 — Adwaita resuelve sus
+ * theme_bg_color ...) NO funciona en GTK 3.24.52: Adwaita resuelve sus
  * propios nombres y se ignora el override. Comprobado midiendo pixeles.
  * Por eso aqui van reglas explicitas sobre los widgets.
  *

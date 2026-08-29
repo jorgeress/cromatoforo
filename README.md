@@ -1,4 +1,4 @@
-# dotfiles — Arch · Hyprland 0.56 · pywal16
+# dotfiles: Arch · Hyprland 0.56 · pywal16
 
 Configuración completa de un escritorio Wayland sobre Arch, con una idea de fondo:
 **todo el sistema se pinta a partir del wallpaper**. Cambias el fondo y la barra,
@@ -370,7 +370,7 @@ extensión dan igual; solo se ignoran los que empiezan por punto.
 La función `fastfetch` de `aliases.sh` coge **uno al azar en cada ejecución**. No
 hay que registrar nada al añadir uno nuevo: basta con dejar el fichero ahí.
 Detecta sola si el arte trae códigos ANSI propios (usa `file-raw` y los respeta) o
-si es texto plano (usa `file`, que sustituye `$1`…`$9` por la paleta de pywal, con
+si es texto plano (usa `file`, que sustituye `$1`...`$9` por la paleta de pywal, con
 lo que el dibujo sigue al wallpaper).
 
 `fflogos` los muestra todos seguidos con su nombre, sin datos al lado, para
@@ -386,8 +386,8 @@ descartar rápido.
 | Relleno del logo | 2 columnas a la izquierda, 4 a la derecha |
 
 De ahí sale el presupuesto con la ventana maximizada: `2 + arte + 4 + 67 ≤ 181`,
-o sea hasta 108 columnas de arte. Pasarse ya no rompe nada — el dibujo se va
-arriba o no sale —, pero cuanto más ancho, menos veces sale al lado de los datos:
+o sea hasta 108 columnas de arte. Pasarse ya no rompe nada (el dibujo se va
+arriba o no sale), pero cuanto más ancho, menos veces sale al lado de los datos:
 
 - **Ancho recomendado: hasta ~90 columnas.** Punto dulce entre 40 y 70.
 - **Alto máximo: ~40 líneas** antes de que la salida no quepa en la ventana.
@@ -507,7 +507,7 @@ Ambos consumen un fichero generado, enlazado desde el caché:
 - `~/.config/cava/config` → `~/.cache/wal/cava-config`
 
 Para tocarlos, edita las plantillas correspondientes y regenera. El gradiente de
-cava usa solo `color0`–`color8` a propósito: ver [trampas](#trampas-y-hallazgos).
+cava usa solo `color0`-`color8` a propósito: ver [trampas](#trampas-y-hallazgos).
 
 ### GTK
 
@@ -576,7 +576,7 @@ Para verlo ya, `steam-theme.sh --restart`.
 te faltan.
 
 **Mantenerlo al día.** Es un clon de git, así que nada te avisa cuando sale una
-versión nueva — y hace falta, porque el skin se rompe cuando Valve cambia la
+versión nueva, y hace falta, porque el skin se rompe cuando Valve cambia la
 interfaz del cliente. El ritmo va a rachas: de la 4.0 a la 4.4 en tres semanas de
 julio de 2026, y antes de eso casi un año sin tocar nada.
 
@@ -621,7 +621,7 @@ ln -sf /usr/lib/millennium/libmillennium_bootstrap_x86.so \
        "$HOME/.local/share/Steam/ubuntu12_32/libXtst.so.6"
 ```
 
-Sustituye la `libXtst.so.6` que Steam trae —la del *X11 Test Extension*— por la
+Sustituye la `libXtst.so.6` que Steam trae (la del *X11 Test Extension*) por la
 suya. Steam la carga creyendo que es la de X11 y así entra Millennium en el
 proceso. Antes usaba `LD_PRELOAD`; el propio script limpia esos restos.
 
@@ -726,8 +726,8 @@ Dos cosas propias de `spotify-launcher` que no salen en las guías:
 
 **Eso está resuelto y no hay que hacer nada.** La unidad `spotify-theme.path`
 vigila el `state.json` del launcher y lanza `spotify-theme.sh --if-stale`. El
-disparador es tonto a propósito —ese fichero se reescribe en **cada** arranque,
-haya actualización o no— y toda la decisión vive en el script.
+disparador es tonto a propósito (ese fichero se reescribe en **cada** arranque,
+haya actualización o no) y toda la decisión vive en el script.
 
 La señal de detección es binaria y no depende de fechas ni de versiones:
 spicetify **extrae** `Apps/xpui.spa` a un directorio `Apps/xpui/` y borra el
@@ -882,8 +882,8 @@ prime-run vulkaninfo --summary | grep deviceName    # necesita vulkan-tools
 
 **GameMode hace menos de lo que promete aquí, y es a propósito.**
 `~/.config/gamemode.ini` deja el gobernador en paz (`desiredgov=powersave`): con
-`intel_pstate` en modo activo, "powersave" no es lento —sube a turbo bajo carga
-en milisegundos— mientras que "performance" clava `min_perf_pct` al 100% y en un
+`intel_pstate` en modo activo, "powersave" no es lento (sube a turbo bajo carga
+en milisegundos), mientras que "performance" clava `min_perf_pct` al 100% y en un
 chasis delgado le roba presupuesto térmico a la GPU, que es quien suele ser el
 cuello de botella. `renice`/`ioprio` van a 0 porque `gamemoded` corre como
 servicio de usuario con `RLIMIT_NICE` a 0 y no puede poner prioridades
@@ -924,7 +924,7 @@ mismo (apagado) y sin ruido.
 ## Cómo probar un cambio
 
 Regla general: **mirar el resultado, no suponerlo**. Casi todo aquí falla en
-silencio — GTK cae al tema claro sin avisar, hyprlock ignora una opción
+silencio: GTK cae al tema claro sin avisar, hyprlock ignora una opción
 inexistente sin más, pywal se come una llave. Comprobar cuesta diez segundos.
 
 ### Hyprland (`hyprland.lua`)
@@ -1163,11 +1163,11 @@ pywal, salidos de leer `pywal/export.py` de la versión instalada:
    wal -R -n -q -s -t -e 2>&1 | grep -i error
    ```
 
-### `color9`–`color15` suelen ser duplicados
+### `color9`-`color15` suelen ser duplicados
 
-En la mayoría de paletas que genera pywal, `color9`–`color15` son copias exactas
-de `color1`–`color7`. Para un gradiente de 8 pasos con valores distintos hay que
-tirar solo de `color0`–`color8`. Es lo que hace el de cava.
+En la mayoría de paletas que genera pywal, `color9`-`color15` son copias exactas
+de `color1`-`color7`. Para un gradiente de 8 pasos con valores distintos hay que
+tirar solo de `color0`-`color8`. Es lo que hace el de cava.
 
 ### GTK: dos trampas encadenadas
 
@@ -1345,7 +1345,7 @@ algo que no debe.
 **OBS Studio** está sin versionar a propósito: ahora mismo su configuración son
 los valores por defecto (perfil y colección de escenas «Untitled»). Cuando tengas
 escenas de verdad, merece la pena añadir `global.ini`, `user.ini` y
-`basic/scenes/` — pero nunca `plugin_config/obs-websocket/`.
+`basic/scenes/`, pero nunca `plugin_config/obs-websocket/`.
 
 **Qt ya está resuelto.** `~/.config/qt5ct/qt5ct.conf` y
 `~/.config/qt6ct/qt6ct.conf` se versionan y apuntan al esquema que genera pywal;

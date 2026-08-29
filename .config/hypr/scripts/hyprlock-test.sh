@@ -18,7 +18,7 @@ printf 'misc { disable_hyprland_logo = true }\n' > "$TMP/min.conf"
 
 before=$(hyprctl instances -j | python3 -c 'import sys,json;print(" ".join(i["instance"] for i in json.load(sys.stdin)))')
 
-echo "▶ arrancando compositor headless de pruebas…"
+echo "▶ arrancando compositor headless de pruebas..."
 AQ_HEADLESS_ONLY=1 Hyprland -c "$TMP/min.conf" >"$TMP/hyprland.log" 2>&1 &
 HLPID=$!
 
@@ -32,7 +32,7 @@ done
 [[ -n $SIG ]] || { echo "✗ el compositor de pruebas no arrancó:"; tail -20 "$TMP/hyprland.log"; exit 1; }
 
 WD=$(hyprctl instances -j | python3 -c "import sys,json;print([x['wl_socket'] for x in json.load(sys.stdin) if x['instance']=='$SIG'][0])")
-echo "▶ lanzando hyprlock contra $WD (10 s)…"
+echo "▶ lanzando hyprlock contra $WD (10 s)..."
 
 out=$(env -i HOME="$HOME" USER="$USER" PATH="$PATH" XDG_RUNTIME_DIR="$XDG_RUNTIME_DIR" \
       WAYLAND_DISPLAY="$WD" HYPRLAND_INSTANCE_SIGNATURE="$SIG" \
@@ -44,7 +44,7 @@ echo "$out" | grep -vi 'TRACE' | grep -iE 'error|does not exist|invalid|no such|
 if [[ $rc -eq 124 ]]; then
     echo "✓ OK: hyprlock aguantó 10 s sin morir. Config usable."
 else
-    echo "✗ hyprlock SALIÓ solo (código $rc) — se te quedaría la pantalla roja. NO la uses:"
+    echo "✗ hyprlock SALIÓ solo (código $rc), se te quedaría la pantalla roja. NO la uses:"
     echo "$out" | tail -20
 fi
 exit $(( rc == 124 ? 0 : 1 ))

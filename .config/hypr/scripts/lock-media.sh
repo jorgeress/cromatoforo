@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# lock-media.sh — linea de reproduccion para hyprlock.
+# lock-media.sh: linea de reproduccion para hyprlock.
 # Sale vacio si no hay nada sonando, para que la pantalla de bloqueo no
 # muestre una linea huerfana.
 #

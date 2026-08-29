@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# lock-battery.sh — linea de bateria para hyprlock.
+# lock-battery.sh: linea de bateria para hyprlock.
 # Sale vacio si el equipo no tiene bateria, para no dejar un hueco raro.
 set -uo pipefail
 

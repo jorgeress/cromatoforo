@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# qt-apply — deja los ficheros de qt5ct/qt6ct apuntando al cache de pywal
+# qt-apply: deja los ficheros de qt5ct/qt6ct apuntando al cache de pywal
 # de ESTE usuario. Hermano de gtk-apply: se ejecuta una vez tras desplegar
 # los dotfiles en una maquina nueva.
 #

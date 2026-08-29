@@ -1,5 +1,5 @@
 # ─────────────────────────────────────────────────────────────
-#  env.sh — variables de entorno. POSIX puro: lo leen zsh (.zshenv),
+#  env.sh: variables de entorno. POSIX puro: lo leen zsh (.zshenv),
 #  bash (.bash_profile) y cualquier cosa que haga `. env.sh`.
 #  Aquí NO van alias ni funciones: eso es aliases.sh.
 # ─────────────────────────────────────────────────────────────

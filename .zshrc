@@ -1,5 +1,5 @@
 # ─────────────────────────────────────────────────────────────
-#  ~/.zshrc — shell interactivo.
+#  ~/.zshrc: shell interactivo.
 #
 #  Reparto de responsabilidades:
 #    ~/.zshenv                    entorno (vía ~/.config/shell/env.sh)

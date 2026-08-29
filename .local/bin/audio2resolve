@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# audio2resolve — convierte audios (m4a, mp3, opus, aac...) a WAV PCM que
+# audio2resolve: convierte audios (m4a, mp3, opus, aac...) a WAV PCM que
 # DaVinci Resolve en Linux importa sin problemas.
 #
 # Uso:

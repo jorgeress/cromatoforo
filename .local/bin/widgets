@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# widgets — lanza y consulta el eye candy del escritorio.
+# widgets: lanza y consulta el eye candy del escritorio.
 # widgets          → panel en scratchpad con pipes, fastfetch, btop y matrix
 # widgets -h       → ayuda y estado de cada programa
 # widgets <nombre> → lanza uno suelto en el scratchpad
@@ -20,7 +20,7 @@ WIDGETS=(
 
 show_help() {
     echo
-    echo "  widgets — eye candy para el escritorio"
+    echo "  widgets: eye candy para el escritorio"
     echo
     printf "  \033[1m%-11s %-11s %s\033[0m\n" "NOMBRE" "ESTADO" "DESCRIPCIÓN"
     echo "  ─────────────────────────────────────────────────────────────────────"

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# zen-apply — engancha Zen Browser a la paleta de pywal.
+# zen-apply: engancha Zen Browser a la paleta de pywal.
 #
 # Hermano de gtk-apply y qt-apply: se ejecuta UNA vez tras desplegar los
 # dotfiles. A partir de ahi el color cambia solo con cada wallpaper.

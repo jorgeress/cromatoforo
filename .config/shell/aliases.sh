@@ -1,5 +1,5 @@
 # ─────────────────────────────────────────────────────────────
-#  aliases.sh — alias y funciones de shell INTERACTIVO.
+#  aliases.sh: alias y funciones de shell INTERACTIVO.
 #  Lo sourcean ~/.bashrc y ~/.zshrc. Las variables de entorno NO van
 #  aquí: están en ~/.config/shell/env.sh, que se lee al hacer login.
 #
@@ -329,7 +329,7 @@ command -v zoxide   >/dev/null && eval "$(zoxide init $_cur_shell)"
 unset _cur_shell
 
 # ─────────────────────────────────────────────────────────────
-#  VÍDEO — proyectos en ~/video
+#  VÍDEO: proyectos en ~/video
 # ─────────────────────────────────────────────────────────────
 
 # Nuevo proyecto: clona _plantilla con el siguiente número libre.
