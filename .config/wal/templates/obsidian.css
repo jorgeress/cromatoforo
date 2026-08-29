@@ -1,0 +1,80 @@
+/* Autogenerado por pywal. NO editar a mano.
+ * Fuente:  ~/.config/wal/templates/obsidian.css
+ * Destino: ~/.cache/wal/obsidian.css
+ *          (enlazado a <vault>/.obsidian/snippets/pywal.css por obsidian-apply)
+ *
+ * POR QUE ESTO ES MUCHO MAS FACIL QUE SPOTIFY
+ *   Obsidian tambien es Electron, pero al contrario que Spotify soporta CSS de
+ *   usuario DE FORMA OFICIAL: los "snippets". No hay que descomprimir ni
+ *   reempaquetar ningun bundle, ni se rompe con cada actualizacion. Y toda su
+ *   interfaz esta construida sobre variables CSS, asi que basta redefinirlas.
+ *
+ * OJO CON LAS LLAVES: van dobladas, que esto es CSS y pywal las usa de
+ * marcador. Una sin doblar aborta el fichero entero en silencio.
+ *
+ * Esta pensado para el modo OSCURO (Ajustes -> Apariencia -> Modo oscuro),
+ * que es de donde sale la paleta.
+ */
+
+.theme-dark
+{{
+    /* Fondos: tres niveles de profundidad a partir de color0. */
+    --background-primary:         {color0};
+    --background-primary-alt:     {color0.lighten(4)};
+    --background-secondary:       {color0.lighten(7)};
+    --background-secondary-alt:   {color0.lighten(10)};
+
+    --background-modifier-border:        {color8};
+    --background-modifier-border-hover:  {color4};
+    --background-modifier-border-focus:  {color4};
+    --background-modifier-hover:         {color0.lighten(14)};
+    --background-modifier-active-hover:  {color0.lighten(18)};
+
+    /* Texto */
+    --text-normal:       {color7};
+    --text-muted:        {color8.lighten(20)};
+    --text-faint:        {color8};
+    --text-accent:       {color6};
+    --text-accent-hover: {color5};
+    --text-on-accent:    {color0};
+    --text-selection:    rgba({color4.rgb}, 0.30);
+    --text-highlight-bg: rgba({color3.rgb}, 0.35);
+
+    /* Elementos interactivos */
+    --interactive-normal:       {color0.lighten(8)};
+    --interactive-hover:        {color0.lighten(14)};
+    --interactive-accent:       {color4};
+    --interactive-accent-hover: {color5};
+
+    /* Enlaces */
+    --link-color:              {color6};
+    --link-color-hover:        {color5};
+    --link-unresolved-color:   {color1};
+
+    /* Encabezados: una rampa que va de mas a menos peso visual. */
+    --h1-color: {color6};
+    --h2-color: {color5};
+    --h3-color: {color4};
+    --h4-color: {color3};
+    --h5-color: {color2};
+    --h6-color: {color8.lighten(20)};
+
+    /* Codigo y citas */
+    --code-background: {color0.lighten(6)};
+    --code-normal:     {color6};
+    --blockquote-border-color: {color4};
+
+    /* Cromo de la ventana */
+    --titlebar-background:         {color0};
+    --titlebar-background-focused: {color0.lighten(5)};
+    --divider-color:               {color8};
+    --scrollbar-thumb-bg:          rgba({color7.rgb}, 0.18);
+    --scrollbar-active-thumb-bg:   rgba({color7.rgb}, 0.32);
+
+    /* Grafo de notas: sin esto se queda con los colores de fabrica y canta. */
+    --graph-line:     {color8};
+    --graph-node:     {color7};
+    --graph-text:     {color7};
+    --graph-node-tag: {color3};
+    --graph-node-attachment: {color2};
+}}

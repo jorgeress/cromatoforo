@@ -114,6 +114,29 @@ if [ -d "$SPO" ]; then
     [ "$vig" = "active" ]; comprueba "Spotify (vigilante)" $? "${vig:-desconocido}"
 else linea "Spotify" "$NA  no instalado"; fi
 
+# yazi y lazygit: enlaces al cache, asi que la paleta siempre esta al dia; lo
+# unico que hace falta es reabrir el programa.
+if command -v yazi >/dev/null 2>&1; then
+    [ "$(readlink -f "$HOME/.config/yazi/theme.toml" 2>/dev/null)" = "$CACHE/yazi-theme.toml" ]
+    comprueba "yazi (enlace del tema)" $?
+else linea "yazi" "$NA  no instalado"; fi
+
+if command -v lazygit >/dev/null 2>&1; then
+    [ "$(readlink -f "$HOME/.config/lazygit/config.yml" 2>/dev/null)" = "$CACHE/lazygit-config.yml" ]
+    comprueba "lazygit (enlace)" $?
+else linea "lazygit" "$NA  no instalado"; fi
+
+# Obsidian: el snippet vive DENTRO del vault, cuya ruta la elige el usuario, asi
+# que hay que preguntarle a obsidian-apply.
+if command -v obsidian >/dev/null 2>&1; then
+    if [ -f "$HOME/.config/obsidian/obsidian.json" ]; then
+        sal="$("$HOME/.local/bin/obsidian-apply" --status 2>/dev/null | grep -c "enlace=si activo=si")"
+        tot="$("$HOME/.local/bin/obsidian-apply" --status 2>/dev/null | grep -c "enlace=")"
+        [ "${sal:-0}" -gt 0 ] && [ "${sal:-0}" -eq "${tot:-1}" ]
+        comprueba "Obsidian (snippet)" $? "${sal:-0}/${tot:-0} vaults"
+    else linea "Obsidian" "$NA  sin abrir todavia"; fi
+else linea "Obsidian" "$NA  no instalado"; fi
+
 echo
 echo "SE REPINTA EN CALIENTE"
 if [ -f "$HOME/.config/Code - OSS/User/settings.json" ]; then

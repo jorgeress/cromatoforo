@@ -1,0 +1,60 @@
+# Autogenerado por pywal. NO editar a mano.
+# Fuente:  ~/.config/wal/templates/lazygit-config.yml
+# Destino: ~/.cache/wal/lazygit-config.yml
+#          (enlazado desde ~/.config/lazygit/config.yml)
+#
+# Este fichero es la configuracion ENTERA de lazygit, no solo los colores. Es el
+# mismo patron que cava-config y starship.toml: si quieres cambiar un ajuste que
+# no sea de color, se cambia AQUI, no en el cache.
+#
+# lazygit tambien admite fusionar varios ficheros con -ucf a,b, pero eso obliga
+# a pasar el flag en cada invocacion o a exportar una variable, y no compensa
+# para un solo consumidor.
+#
+# SOBRE LOS COLORES: aqui SI se tematiza todo, al contrario que en eza o yazi.
+# El motivo es que lazygit usa ranuras semanticas (rojo = sin preparar, verde =
+# activo) y la paleta de pywal tambien las tiene: color1 es la ranura roja,
+# color2 la verde, etc. Al mapear ranura contra ranura el significado se
+# conserva. Lo que se pierde es el contraste cuando el fondo de pantalla es
+# monocromo y todas las ranuras salen del mismo tono; eso ya pasa con el
+# resaltado de sintaxis de zsh y es una consecuencia asumida del sistema.
+
+gui:
+  nerdFontsVersion: "3"
+
+  theme:
+    activeBorderColor:
+      - "{color4}"
+      - bold
+    inactiveBorderColor:
+      - "{color8}"
+    searchingActiveBorderColor:
+      - "{color3}"
+      - bold
+    optionsTextColor:
+      - "{color6}"
+    selectedLineBgColor:
+      - "{color8}"
+    inactiveViewSelectedLineBgColor:
+      - bold
+    cherryPickedCommitFgColor:
+      - "{color0}"
+    cherryPickedCommitBgColor:
+      - "{color5}"
+    markedBaseCommitFgColor:
+      - "{color0}"
+    markedBaseCommitBgColor:
+      - "{color3}"
+    unstagedChangesColor:
+      - "{color1}"
+    defaultFgColor:
+      - "{color7}"
+
+git:
+  paging:
+    colorArg: always
+
+  # Los commits de este repo se firman con el correo noreply, no con el
+  # personal. Eso vive en la config del propio repo, no aqui.
+  commit:
+    signOff: false

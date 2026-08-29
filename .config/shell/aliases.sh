@@ -124,6 +124,40 @@ fe() {
     f=$(fd --type f --hidden --exclude .git | fzf --preview 'bat --color=always {}') && "${EDITOR:-nvim}" "$f"
 }
 
+# yazi: al salir con Q deja la shell en el ultimo directorio que estabas viendo.
+# Es la integracion que recomienda yazi; sin ella navegas y vuelves donde estabas.
+#
+# OJO: aqui NO se puede usar `cat` para leer el fichero. En este mismo fichero
+# `cat` esta aliaseado a `bat -pp`, y dentro de una funcion el alias se expande
+# igual. Por eso se lee con `read`, que ademas es POSIX y no lanza un proceso.
+y() {
+    yazi_tmp="$(mktemp -t yazi-cwd.XXXXXX)"
+    yazi --cwd-file="$yazi_tmp" "$@"
+    IFS= read -r yazi_cwd < "$yazi_tmp"
+    [ -n "$yazi_cwd" ] && [ "$yazi_cwd" != "$PWD" ] && cd -- "$yazi_cwd"
+    rm -f -- "$yazi_tmp"
+    unset yazi_tmp yazi_cwd
+}
+
+# lazygit sobre el repo bare de dotfiles, con las mismas rutas que el alias dot.
+alias lazydot='lazygit --git-dir="$HOME/.dotfiles" --work-tree="$HOME"'
+
+# Ficha tecnica de un fichero de audio o video: codec, perfil, formato de pixel,
+# muestreo, canales. Es lo que uno buscaria en mediainfo, pero con ffprobe, que
+# ya viene con ffmpeg. mediainfo se descarto porque su libmediainfo arrastra
+# graphviz, y graphviz arrastra ghostscript, gd, gts y netpbm: unos 200 MB para
+# leer una cabecera.
+#
+# Util sobre todo antes de meter algo en Resolve, que es tiquismiquis con los
+# formatos (de ahi que exista audio2resolve).
+codec() {
+    [ -n "${1:-}" ] || { echo "uso: codec FICHERO"; return 1; }
+    ffprobe -v error -hide_banner \
+        -show_entries format=format_name,duration,size,bit_rate \
+        -show_entries stream=index,codec_type,codec_name,profile,width,height,pix_fmt,r_frame_rate,sample_rate,channels \
+        -of default=noprint_wrappers=1 -- "$1"
+}
+
 # Matar proceso interactivamente
 fkill() {
     local pid

@@ -61,6 +61,9 @@ wallpaper.jpg
                       ├── starship.toml        → starship            (STARSHIP_CONFIG)
                       ├── zsh-colors.zsh       → plugins de zsh      (source en .zshrc)
                       ├── shell-tools.sh       → fzf y eza           (source en aliases.sh)
+                      ├── yazi-theme.toml      → yazi                (enlace simbólico)
+                      ├── lazygit-config.yml   → lazygit             (enlace simbólico)
+                      ├── obsidian.css         → Obsidian            (snippet en el vault)
                       ├── pywal.theme          → btop                (enlace simbólico)
                       ├── cava-config          → cava                (enlace simbólico)
                       ├── colors-qt.conf       → qt5ct/qt6ct → OBS y
@@ -138,6 +141,9 @@ Estado real, comprobado en este equipo. Nada de "debería funcionar".
 | **Steam** | al arrancar el cliente | CSS inyectado en `steamui/`, no recarga en caliente |
 | **Spotify** | tras `spicetify apply` y reabrir | hay que reparchear el bundle de Electron |
 | **Zen Browser** | al reiniciar el navegador | Firefox y sus forks no recargan el CSS del chrome en caliente |
+| **yazi** | al reabrirlo | lee `theme.toml` al arrancar |
+| **lazygit** | al reabrirlo | lee `config.yml` al arrancar |
+| **Obsidian** | al reabrirlo | el snippet vive dentro del vault; lo engancha `obsidian-apply` |
 
 ### No sigue la paleta, y no es un descuido
 
@@ -261,6 +267,7 @@ pérdida con `dot checkout -f`.
 ├── gtk-apply                 reaplica los ajustes GTK que viven en dconf
 ├── qt-apply                  arregla la ruta absoluta del esquema Qt
 ├── zen-apply                 engancha el perfil de Zen al userChrome de pywal
+├── obsidian-apply            engancha el snippet de pywal al vault de Obsidian
 └── dotfiles-bootstrap        deja una maquina recien clonada lista
 .zshenv       lee env.sh; se ejecuta siempre, hasta en scripts
 .zprofile     login: arranca Hyprland en la tty1
@@ -1190,6 +1197,62 @@ pywal, salidos de leer `pywal/export.py` de la versión instalada:
    `theme-status.sh --templates` después de cada `wal`, que compara la fecha de
    cada fichero del caché con la de `~/.cache/wal/colors` y te avisa por
    notificación de las que no se regeneraron.
+
+### btrfs: una imagen de máquina virtual se fragmenta hasta lo absurdo
+
+Medido en este equipo, no leído en ningún sitio. Un fichero de 200 MB, 400
+escrituras de 64 K en posiciones aleatorias (que es lo que hace una VM todo el
+rato: su registro, su swap, sus temporales):
+
+| | extents |
+|---|---|
+| Con copy-on-write, o sea por defecto | **1907** |
+| Con `chattr +C` | **1** |
+
+Un *extent* es un trozo contiguo. Con 1907, leer ese fichero de punta a punta
+son 1907 saltos en vez de uno.
+
+La causa es que btrfs **nunca sobrescribe**: cuando cambias un bloque, escribe
+el dato nuevo en otro sitio libre y reapunta el índice. Para las instantáneas de
+snapper eso es justo lo que las hace gratis, pero una imagen de disco virtual es
+el peor caso posible, porque son millones de escrituras sueltas dentro de un
+fichero enorme. Y no se estabiliza: con solo 400 escrituras ya subió de 1599 a
+1907.
+
+`chattr +C` apaga el CoW y, de paso, la compresión. Las dos interesan apagadas:
+comprimir un disco virtual es trabajo tirado porque dentro ya hay datos
+comprimidos.
+
+**Hay que hacerlo antes de crear nada**, porque el atributo solo lo heredan los
+ficheros nuevos:
+
+```bash
+mkdir -p ~/vm
+chattr +C ~/vm
+lsattr -d ~/vm      # tiene que salir una C
+```
+
+Y luego decirle a libvirt que use ese directorio, en vez de
+`/var/lib/libvirt/images`, que está en `/` y **sí lo cubre snapper**: cada
+instantánea se llevaría una copia de tus discos virtuales.
+
+```bash
+virsh -c qemu:///system pool-define /dev/stdin <<'EOF'
+<pool type='dir'><name>vm</name><target><path>/home/TUUSUARIO/vm</path></target></pool>
+EOF
+virsh -c qemu:///system pool-autostart vm && virsh -c qemu:///system pool-start vm
+```
+
+Dos cosas más que muerden con libvirt en un portátil de un solo usuario:
+
+1. La red `default` viene **inactiva y sin autoarranque**. Es la causa número
+   uno de "mi VM no tiene internet":
+   `virsh -c qemu:///system net-start default && virsh -c qemu:///system net-autostart default`
+2. Con `qemu:///system`, QEMU corre como `libvirt-qemu`, y `/home/usuario` es
+   `drwx------`. O sea que **no puede entrar en `~/vm`**. Se arregla poniendo
+   `user` y `group` a tu usuario en `/etc/libvirt/qemu.conf`. Rebaja la
+   seguridad (una fuga de la VM aterriza con tus permisos), pero la alternativa
+   es aflojar los permisos de tu carpeta personal, que es peor.
 
 ### eza ignora los colores en hex sin decir nada
 

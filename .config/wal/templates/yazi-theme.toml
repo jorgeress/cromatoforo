@@ -1,0 +1,101 @@
+# Autogenerado por pywal. NO editar a mano.
+# Fuente:  ~/.config/wal/templates/yazi-theme.toml
+# Destino: ~/.cache/wal/yazi-theme.toml  (enlazado desde ~/.config/yazi/theme.toml)
+#
+# OJO CON LAS LLAVES: el TOML de yazi usa tablas en linea, "{{ fg = ... }}", asi
+# que TODAS las llaves de este fichero van dobladas. Si se escapa una sin doblar
+# pywal no sabra parsear el marcador, abortara el fichero entero y te dejara el
+# anterior sin decir nada. theme-status.sh --templates lo caza.
+#
+# QUE SE TEMATIZA Y QUE NO, Y POR QUE
+#   Aqui va solo el CROMO: bordes, barra de estado, pestanas, el indicador de
+#   modo, los marcadores de copiar/cortar, los cuadros de dialogo.
+#
+#   NO hay seccion [filetype] ni syntect_theme, y es deliberado. Los colores de
+#   tipo de fichero (azul carpeta, etc.) y el resaltado de sintaxis del
+#   previsualizador SIGNIFICAN algo: los lees sin pensar. Aplastarlos con una
+#   paleta sacada de una foto te hace perder informacion. Es la misma decision
+#   que se tomo con eza y con bat, y esta explicada en el apartado
+#   "No sigue la paleta, y no es un descuido" del README.
+
+[mgr]
+cwd             = {{ fg = "{color6}" }}
+hovered         = {{ fg = "{color0}", bg = "{color4}" }}
+preview_hovered = {{ underline = true }}
+
+find_keyword  = {{ fg = "{color3}", italic = true }}
+find_position = {{ fg = "{color5}", bg = "reset", italic = true }}
+
+symlink_target = {{ italic = true }}
+
+marker_copied   = {{ fg = "{color2}", bg = "{color2}" }}
+marker_cut      = {{ fg = "{color1}", bg = "{color1}" }}
+marker_marked   = {{ fg = "{color6}", bg = "{color6}" }}
+marker_selected = {{ fg = "{color3}", bg = "{color3}" }}
+
+count_copied   = {{ fg = "{color0}", bg = "{color2}" }}
+count_cut      = {{ fg = "{color0}", bg = "{color1}" }}
+count_selected = {{ fg = "{color0}", bg = "{color3}" }}
+
+border_symbol = "│"
+border_style  = {{ fg = "{color8}" }}
+
+[tabs]
+active   = {{ fg = "{color0}", bg = "{color4}", bold = true }}
+inactive = {{ fg = "{color7}", bg = "{color8}" }}
+
+[mode]
+normal = {{ fg = "{color0}", bg = "{color4}", bold = true }}
+select = {{ fg = "{color0}", bg = "{color3}", bold = true }}
+unset  = {{ fg = "{color0}", bg = "{color1}", bold = true }}
+
+[status]
+overall   = {{ fg = "{color7}" }}
+sep_left  = {{ open = "", close = "" }}
+sep_right = {{ open = "", close = "" }}
+
+[input]
+border   = {{ fg = "{color4}" }}
+title    = {{ fg = "{color6}" }}
+value    = {{ fg = "{color7}" }}
+selected = {{ bg = "{color8}" }}
+
+[pick]
+border   = {{ fg = "{color4}" }}
+active   = {{ fg = "{color5}", bold = true }}
+inactive = {{ fg = "{color7}" }}
+
+[confirm]
+border     = {{ fg = "{color4}" }}
+title      = {{ fg = "{color6}" }}
+content    = {{}}
+list       = {{ fg = "{color5}" }}
+btn_yes    = {{ fg = "{color0}", bg = "{color2}", bold = true }}
+btn_no     = {{ fg = "{color7}" }}
+btn_labels = [ "  Sí  ", "  No  " ]
+
+[tasks]
+border  = {{ fg = "{color4}" }}
+title   = {{ fg = "{color6}" }}
+hovered = {{ fg = "{color5}", underline = true }}
+
+[which]
+cols            = 3
+mask            = {{ bg = "{color0}" }}
+cand            = {{ fg = "{color6}" }}
+rest            = {{ fg = "{color8}" }}
+desc            = {{ fg = "{color5}" }}
+separator       = "  "
+separator_style = {{ fg = "{color8}" }}
+
+[help]
+on      = {{ fg = "{color6}" }}
+run     = {{ fg = "{color5}" }}
+desc    = {{ fg = "{color7}" }}
+hovered = {{ bg = "{color8}", bold = true }}
+footer  = {{ fg = "{color0}", bg = "{color7}" }}
+
+[notify]
+title_info  = {{ fg = "{color2}" }}
+title_warn  = {{ fg = "{color3}" }}
+title_error = {{ fg = "{color1}" }}

@@ -1,3 +1,4 @@
+7zip
 alsa-utils
 asciiquarium
 awww
@@ -16,7 +17,9 @@ code
 cryptsetup
 davinci-resolve
 discord
+dnsmasq
 duf
+edk2-ovmf
 efibootmgr
 expac
 eza
@@ -44,11 +47,13 @@ intel-ucode
 jq
 kitty
 kvantum
+lazygit
 lib32-gamemode
 lib32-mangohud
 lib32-mesa
 lib32-nvidia-utils
 lib32-vulkan-intel
+libvirt
 linux
 linux-firmware
 linux-headers
@@ -71,6 +76,7 @@ nvidia-prime
 nvidia-utils
 nwg-look
 obs-studio
+obsidian
 openssh
 paru
 paru-debug
@@ -82,6 +88,7 @@ pipewire-pulse
 playerctl
 polkit-gnome
 python-pywal16
+qemu-desktop
 qt5ct
 qt6ct
 reflector
@@ -97,6 +104,7 @@ starship
 steam
 sudo
 swaync
+swtpm
 terminus-font
 texinfo
 thunar
@@ -110,8 +118,11 @@ ttf-ms-fonts
 tty-clock
 ufw
 unimatrix-git
+unrar
 unzip
 vim
+virt-manager
+virt-viewer
 vulkan-intel
 vulkan-tools
 waybar
@@ -120,6 +131,8 @@ wl-clipboard
 wlogout
 wofi
 xdg-desktop-portal-hyprland
+yazi
+yt-dlp
 zen-browser-bin
 zoxide
 zsh
