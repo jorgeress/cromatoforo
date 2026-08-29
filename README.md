@@ -127,6 +127,7 @@ Estado real, comprobado en este equipo. Nada de "debería funcionar".
 | GTK3 / GTK4 | `colors-gtk.css` | Thunar, pavucontrol, GIMP, nwg-look |
 | hyprlock | `colors-hyprlock.conf` | al bloquear |
 | **Code - OSS** | `colors-vscode-custom.json` | VS Code relee `settings.json` en caliente |
+| **Obsidian** | `obsidian.css` | recarga los snippets en caliente. Hay que **copiar** el fichero al vault, no enlazarlo: su vigilante mira el directorio y un enlace no cambia de metadatos |
 | terminales abiertas | `sequences` | paleta ANSI y fondo |
 
 ### Cambia, pero con retraso o al reabrir
@@ -143,7 +144,6 @@ Estado real, comprobado en este equipo. Nada de "debería funcionar".
 | **Zen Browser** | al reiniciar el navegador | Firefox y sus forks no recargan el CSS del chrome en caliente |
 | **yazi** | al reabrirlo | lee `theme.toml` al arrancar |
 | **lazygit** | al reabrirlo | lee `config.yml` al arrancar |
-| **Obsidian** | al reabrirlo, o puede que en caliente | el snippet se **copia** dentro del vault (`obsidian-apply`); con enlace simbólico su vigilante no se enteraba |
 
 ### No sigue la paleta, y no es un descuido
 
@@ -941,10 +941,22 @@ rechistar. Comprobar cuesta diez segundos.
 ~/.config/hypr/scripts/theme-status.sh
 ```
 
-Recorre las trece plantillas, los enlaces de btop y cava, el `@import` de GTK,
-la ruta absoluta de Qt, el `userChrome` de Zen con su pref, el parcheo de Steam
-y de Spotify con su vigilante, y los colores de Code - OSS. Sale con código
+Recorre las plantillas, los enlaces de btop y cava, el `@import` de GTK, la ruta
+absoluta de Qt, el `userChrome` de Zen con su pref, el parcheo de Steam y de
+Spotify, el snippet de Obsidian y los colores de Code - OSS. Sale con código
 distinto de cero si algo falla, así que sirve dentro de un script.
+
+**Y comprueba también los procesos abiertos**, que es distinto de comprobar los
+ficheros. Un Steam abierto desde ayer tiene la paleta de ayer por muy al día que
+esté su CSS en disco, y durante un tiempo el informe daba `ok` a eso. La sección
+*"lo que estás viendo ahora mismo"* compara la fecha de arranque de cada proceso
+(sacada de `/proc/PID`, no de `ps -o lstart`, que la imprime en el idioma de la
+sesión y `date -d` no sabe leerla) con la de la paleta.
+
+En la misma línea, la comprobación de Spotify no mira el `color.ini` copiado
+sino el `--spice-main` que spicetify dejó **inyectado en el bundle**. Comparar
+la copia no valía para nada: se hace siempre y coincide siempre, mientras que
+aplicar solo ocurre con Spotify cerrado.
 
 Existe porque `wall.sh` lanza los themers en segundo plano y con la salida a
 `/dev/null`. Eso está bien (no quieres ruido en cada `SUPER+W`) pero significa
