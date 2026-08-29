@@ -92,7 +92,7 @@ propio `wall.sh` para que nadie la añada por error:
 | cava | `~/.config/cava/config` es un enlace al caché; recarga con la tecla `c` |
 | plugins de zsh | `~/.zshrc` sourcea el caché al abrir la shell; las ya abiertas se quedan con los colores viejos hasta un `exec zsh` |
 | Steam | el CSS se lee al arrancar el cliente. `wall.sh` lo regenera pero **no reinicia Steam**: te lo cerraría en mitad de una partida |
-| Spotify | igual. `spotify-theme.sh` solo aplica el parche si Spotify está cerrado |
+| Spotify | igual. `spotify-theme.sh` reaplica cuando la paleta de dentro del bundle no coincide con la actual, esté abierto o no |
 
 Y uno que **sí** necesita un empujón raro, `qt6ct`: el plugin vigila
 `~/.config/qt6ct/qt6ct.conf`, no el esquema de color al que ese fichero apunta.
@@ -701,8 +701,21 @@ El tercer comando **hace falta**: el enlace de `default.target.wants/` que crea
 Sin el, las unidades estan en el repo pero dormidas.
 
 `SUPER+W` regenera `~/.cache/wal/spicetify-color.ini` y lo copia al tema
-`~/.config/spicetify/Themes/pywal/`. El parche en sí (`spicetify apply`) **solo
-se lanza si Spotify está cerrado**; con `--force` se aplica igualmente.
+`~/.config/spicetify/Themes/pywal/`.
+
+**Cuándo se aplica el parche.** Durante un tiempo la regla fue "solo si Spotify
+está cerrado", para no tirarte el reproductor a mitad de canción. Esa regla
+tenía sentido cuando `spicetify apply` reiniciaba Spotify, pero desde que todo
+va con `-n` ya no lo toca nunca, y la restricción se quedó ahí haciendo daño:
+
+> Cambiabas de fondo con Spotify abierto → se copiaba el `color.ini` pero no se
+> aplicaba → cerrabas Spotify → **seguía con los colores viejos para siempre**,
+> porque el `color.ini` ya coincidía y nadie volvía a intentarlo.
+
+Ahora la condición es la correcta: se aplica cuando el `--spice-main` que hay
+**inyectado en el bundle** no coincide con el `color0` de la paleta. Eso arregla
+el caso de arriba y de paso evita reaplicar por gusto. Si Spotify está abierto,
+los colores nuevos los ves al reabrirlo.
 
 **Lo caro no es el tiempo, es el reinicio.** Medido en este equipo: el trabajo
 gordo de `spicetify apply` es descomprimir, parchear y recomprimir
@@ -934,6 +947,18 @@ Regla general: **mirar el resultado, no suponerlo**. Casi todo aquí falla en
 silencio: GTK cae al tema claro sin avisar, hyprlock ignora una opción
 inexistente sin más, pywal se come una llave, eza descarta un color en hex sin
 rechistar. Comprobar cuesta diez segundos.
+
+### Cómo reabrir cada programa de verdad
+
+No todos se cierran igual, y con uno de ellos lo que parece cerrarlo no lo
+cierra:
+
+| | Cómo |
+|---|---|
+| **Steam** | `steam-theme.sh --restart`. `SUPER+Q` **no vale**: es `window.close()`, o sea lo mismo que la X, y Steam se va a la bandeja con doce procesos vivos y el CSS viejo cargado |
+| **Zen** | Cerrar la ventana basta. Si se resiste, `pkill -x zen-bin` |
+| **Spotify** | Cerrar la ventana basta |
+| **Code - OSS**, **Obsidian** | Nada, se repintan solos |
 
 ### Lo primero: `theme-status.sh`
 

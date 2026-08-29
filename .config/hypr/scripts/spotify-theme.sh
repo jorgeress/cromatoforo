@@ -69,6 +69,20 @@ MODE="${1:-auto}"
 have_spicetify() { command -v spicetify >/dev/null 2>&1; }
 
 is_patched() { [ -d "${APPS}/xpui" ]; }
+
+# ¿Lo que hay INYECTADO en el bundle coincide con la paleta de ahora?
+#
+# Comparar el color.ini copiado no sirve de nada: la copia se hace en cada
+# cambio de fondo y por tanto coincide SIEMPRE. Lo que solo pasa al aplicar es
+# que esos colores entren en el bundle. Asi que se lee de dentro.
+paleta_rancia() {
+    is_patched || return 1        # sin parchear, de eso se ocupa is_stale
+    local inyectado esperado
+    inyectado="$(grep -rhoE -- '--spice-main:[[:space:]]*#[0-9a-fA-F]{6}' "${APPS}/xpui/"*.css 2>/dev/null \
+                 | head -1 | grep -oE '#[0-9a-fA-F]{6}' | tr 'A-F' 'a-f')"
+    esperado="$(head -1 "${HOME}/.cache/wal/colors" 2>/dev/null | tr 'A-F' 'a-f')"
+    [ -n "$inyectado" ] && [ -n "$esperado" ] && [ "$inyectado" != "$esperado" ]
+}
 # Rancio = el bundle esta en su forma empaquetada, que es como sale del .deb.
 is_stale()   { [ -f "${APPS}/xpui.spa" ]; }
 
@@ -106,7 +120,9 @@ have_spicetify || exit 0
 [ -f "$SRC" ] || exit 0
 
 if [ "$MODE" = "--if-stale" ]; then
-    is_stale || exit 0
+    # Dispara tanto si una actualizacion se llevo el parche como si la paleta
+    # de dentro del bundle se quedo atras.
+    is_stale || paleta_rancia || exit 0
     # El disparador salta EN MITAD de la actualizacion: el launcher escribe
     # state.json y sigue extrayendo. Parchear un arbol a medio extraer deja
     # Spotify en pantalla blanca, asi que esperamos a que termine.
@@ -130,11 +146,23 @@ if [ -d "$SPOTIFY_DIR" ]; then
 fi
 spicetify config current_theme pywal color_scheme pywal >/dev/null 2>&1 || true
 
-# Aplicar es lento (segundos) y obliga a reabrir Spotify. En el camino
-# automatico solo se hace si Spotify esta cerrado: asi el cambio de wallpaper
-# no te tira el reproductor a mitad de cancion. Con --if-stale se aplica
-# igualmente, porque el parche YA no esta: no hay nada que romper.
-if [ "$MODE" = "--force" ] || [ "$MODE" = "--if-stale" ] || ! pgrep -x spotify >/dev/null; then
+# CUANDO SE APLICA, Y POR QUE CAMBIO
+#   Antes esto solo aplicaba si Spotify estaba CERRADO, para no tirarte el
+#   reproductor a mitad de cancion. Esa regla tenia sentido cuando `spicetify
+#   apply` reiniciaba Spotify; desde que todo va con -n no lo reinicia nunca, y
+#   la restriccion se habia quedado ahi haciendo dano:
+#
+#     cambiabas de fondo con Spotify abierto -> se copiaba el color.ini pero NO
+#     se aplicaba -> cerrabas Spotify -> seguia con los colores viejos PARA
+#     SIEMPRE, porque el color.ini ya coincidia y nadie volvia a intentarlo.
+#
+#   Ahora la condicion es la correcta: se aplica cuando lo que hay dentro del
+#   bundle NO coincide con la paleta. Eso arregla el caso de arriba y ademas
+#   evita reaplicar por gusto, que son unos 18 segundos de CPU cada vez.
+#
+#   Con -n el proceso no se toca: si Spotify esta abierto, los colores nuevos
+#   los veras al reabrirlo.
+if [ "$MODE" = "--force" ] || [ "$MODE" = "--if-stale" ] || is_stale || paleta_rancia; then
     if is_stale; then
         # Bundle empaquetado: spicetify borra la copia caducada, rehace una de
         # los ficheros nuevos y aplica. No hay que borrar nada a mano.
