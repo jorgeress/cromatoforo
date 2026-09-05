@@ -5,6 +5,9 @@
 #                           (por defecto 3, elegidos al azar de ~/Pictures/wallpapers)
 #   gallery.sh w1.jpg w2.png ...   usa exactamente esos wallpapers
 #   gallery.sh --hyprlock   ademas, captura hyprlock en un compositor headless
+#   gallery.sh --margen N   espera N segundos antes de empezar (por defecto 0),
+#                           para darte tiempo a cambiar de espacio de trabajo y
+#                           dejar el escritorio como quieras que salga
 #
 # Salida: ~/Pictures/screenshots/gallery/
 #
@@ -26,10 +29,14 @@ command -v grim >/dev/null || { echo "falta grim (pacman -S grim)"; exit 1; }
 [ -x "$WALLSH" ] || { echo "no encuentro $WALLSH"; exit 1; }
 
 HYPRLOCK=0
+MARGEN=0
 args=()
+esperando_margen=0
 for a in "$@"; do
+    if [ "$esperando_margen" -eq 1 ]; then MARGEN="$a"; esperando_margen=0; continue; fi
     case "$a" in
         --hyprlock) HYPRLOCK=1 ;;
+        --margen)   esperando_margen=1 ;;
         *) args+=("$a") ;;
     esac
 done
@@ -55,6 +62,11 @@ else
     mapfile -t WALLS < <(find "$WALLDIR" -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' \) | shuf -n 3)
 fi
 [ ${#WALLS[@]} -gt 0 ] || { echo "no hay wallpapers en $WALLDIR"; exit 1; }
+
+if [ "$MARGEN" -gt 0 ] 2>/dev/null; then
+    echo "▶ empiezo en $MARGEN s: coloca el escritorio como quieras que salga"
+    sleep "$MARGEN"
+fi
 
 echo "▶ ${#WALLS[@]} capturas del escritorio en $OUT"
 i=0
