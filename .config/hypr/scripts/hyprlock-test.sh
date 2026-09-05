@@ -34,7 +34,12 @@ done
 WD=$(hyprctl instances -j | python3 -c "import sys,json;print([x['wl_socket'] for x in json.load(sys.stdin) if x['instance']=='$SIG'][0])")
 echo "▶ lanzando hyprlock contra $WD (10 s)..."
 
+# El locale va explicito. Con 'env -i' a secas se pierde LC_TIME, y entonces
+# esto prueba un bloqueo con la fecha en otro idioma que el que veras al
+# bloquear de verdad: '%A, %d de %B' pasa de "sabado, 05 de septiembre" a
+# "Saturday, 05 de September".
 out=$(env -i HOME="$HOME" USER="$USER" PATH="$PATH" XDG_RUNTIME_DIR="$XDG_RUNTIME_DIR" \
+      LANG="${LANG:-}" LC_ALL="${LC_ALL:-}" LC_TIME="${LC_TIME:-}" \
       WAYLAND_DISPLAY="$WD" HYPRLAND_INSTANCE_SIGNATURE="$SIG" \
       timeout 10 hyprlock -v -c "$CONF" --grace 0 2>&1)
 rc=$?
