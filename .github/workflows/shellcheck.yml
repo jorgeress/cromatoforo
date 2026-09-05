@@ -1,0 +1,38 @@
+# Pasa shellcheck por los scripts del repo.
+#
+# Solo falla en severidad `error` (fallos reales, no manias de estilo): esto es
+# configuracion personal, no una libreria, y un CI que se pone rojo por un
+# `SC2086` inofensivo se acaba ignorando. Para apretarlo, baja --severity a
+# `warning` y arregla lo que salga.
+#
+# Las plantillas de ~/.config/wal/templates/ NO se analizan a proposito: no son
+# shell valido hasta que pywal les sustituye los {color0} de dentro.
+
+name: shellcheck
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  shellcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar shellcheck
+        run: sudo apt-get update && sudo apt-get install -y shellcheck
+
+      - name: Analizar los scripts
+        run: |
+          mapfile -t files < <(
+            git ls-files \
+              '.local/bin/*' \
+              '.config/hypr/scripts/*.sh' \
+              '.config/shell/*.sh'
+          )
+          printf 'Analizando %d ficheros:\n' "${#files[@]}"
+          printf '  %s\n' "${files[@]}"
+          shellcheck --severity=error --shell=bash "${files[@]}"
