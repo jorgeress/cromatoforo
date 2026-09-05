@@ -23,8 +23,41 @@ eDP-2 de 1920x1080 a 144 Hz, escala 1.
 
 ---
 
+## Galería
+
+Las mismas nueve pantallas con dos paletas opuestas. **Entre una columna y otra
+no se ha tocado ni una línea de configuración**: lo único que cambia es el
+wallpaper, y con él la barra, el prompt, el explorador, el editor, el navegador,
+Spotify y Steam.
+
+A la izquierda `akira.png`, rojo y muy saturado. A la derecha `kyogre.png`,
+turquesa frío. Las capturas están reducidas: pincha en cualquiera para verla
+entera.
+
+| | akira | kyogre |
+|---|---|---|
+| **Escritorio** | ![escritorio con akira](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/escritorio-akira.jpg) | ![escritorio con kyogre](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/escritorio-kyogre.jpg) |
+| **fastfetch** | ![fastfetch con akira](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/fastfetch-akira.jpg) | ![fastfetch con kyogre](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/fastfetch-kyogre.jpg) |
+| **widgets** | ![widgets con akira](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/widgets-akira.jpg) | ![widgets con kyogre](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/widgets-kyogre.jpg) |
+| **btop** | ![btop con akira](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/btop-akira.jpg) | ![btop con kyogre](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/btop-kyogre.jpg) |
+| **Thunar (GTK)** | ![thunar con akira](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/thunar-akira.jpg) | ![thunar con kyogre](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/thunar-kyogre.jpg) |
+| **Code - OSS** | ![code con akira](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/code-akira.jpg) | ![code con kyogre](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/code-kyogre.jpg) |
+| **Zen Browser** | ![zen con akira](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/zen-akira.jpg) | ![zen con kyogre](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/zen-kyogre.jpg) |
+| **Spotify** | ![spotify con akira](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/spotify-akira.jpg) | ![spotify con kyogre](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/spotify-kyogre.jpg) |
+| **Steam** | ![steam con akira](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/steam-akira.jpg) | ![steam con kyogre](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/steam-kyogre.jpg) |
+
+Y la pantalla de bloqueo, que saca su color del mismo sitio:
+
+![hyprlock](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/hyprlock.jpg)
+
+Todas se generan con `~/.config/hypr/scripts/gallery.sh`, que la de hyprlock la
+hace en un compositor aparte para no bloquear la sesión de verdad.
+
+---
+
 ## Índice
 
+- [Galería](#galería)
 - [El sistema de color](#el-sistema-de-color)
 - [Qué se tematiza y qué no](#qué-se-tematiza-y-qué-no)
 - [Instalación en una máquina nueva](#instalación-en-una-máquina-nueva)

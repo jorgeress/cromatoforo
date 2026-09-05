@@ -25,6 +25,34 @@ listed as "should work".
 
 ---
 
+## Gallery
+
+The same nine screens under two opposite palettes. **Not a single line of config
+differs between the columns**: the only thing that changed is the wallpaper, and
+with it the bar, the prompt, the file manager, the editor, the browser, Spotify
+and Steam.
+
+Left is `akira.png`, red and heavily saturated. Right is `kyogre.png`, a cold
+turquoise. Images are scaled down, click any of them for the full size.
+
+| | akira | kyogre |
+|---|---|---|
+| **Escritorio** | ![escritorio con akira](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/escritorio-akira.jpg) | ![escritorio con kyogre](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/escritorio-kyogre.jpg) |
+| **fastfetch** | ![fastfetch con akira](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/fastfetch-akira.jpg) | ![fastfetch con kyogre](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/fastfetch-kyogre.jpg) |
+| **widgets** | ![widgets con akira](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/widgets-akira.jpg) | ![widgets con kyogre](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/widgets-kyogre.jpg) |
+| **btop** | ![btop con akira](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/btop-akira.jpg) | ![btop con kyogre](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/btop-kyogre.jpg) |
+| **Thunar (GTK)** | ![thunar con akira](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/thunar-akira.jpg) | ![thunar con kyogre](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/thunar-kyogre.jpg) |
+| **Code - OSS** | ![code con akira](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/code-akira.jpg) | ![code con kyogre](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/code-kyogre.jpg) |
+| **Zen Browser** | ![zen con akira](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/zen-akira.jpg) | ![zen con kyogre](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/zen-kyogre.jpg) |
+| **Spotify** | ![spotify con akira](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/spotify-akira.jpg) | ![spotify con kyogre](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/spotify-kyogre.jpg) |
+| **Steam** | ![steam con akira](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/steam-akira.jpg) | ![steam con kyogre](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/steam-kyogre.jpg) |
+
+And the lock screen, which takes its colour from the same place:
+
+![hyprlock](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/hyprlock.jpg)
+
+---
+
 ## How the colour system works
 
 One single source of truth: the wallpaper.
