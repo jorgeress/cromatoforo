@@ -21,7 +21,11 @@ alias whoowns='pacman -Qo'             # qué paquete trae este fichero
 alias orphans='pacman -Qdtq | ifne sudo pacman -Rns -'
 alias pacclean='paru -Sc && paccache -rk2'
 alias mirrors='sudo reflector --country Spain,France,Portugal --age 12 --protocol https --sort rate --save /etc/pacman.d/mirrorlist'
-alias pkglist='pacman -Qqe > ~/.config/pkglists/pkgs-repo.txt && pacman -Qqem > ~/.config/pkglists/pkgs-aur.txt && echo "listas actualizadas"'
+# -Qqen es lo nativo (repos oficiales) y -Qqem lo foraneo (AUR). Con -Qqe a
+# secas los paquetes de AUR caen tambien en la lista de repos, y entonces el
+# `pacman -S --needed - < pkgs-repo.txt` de la instalacion aborta entero con un
+# "target not found" en el primero que encuentra.
+alias pkglist='pacman -Qqen > ~/.config/pkglists/pkgs-repo.txt && pacman -Qqem > ~/.config/pkglists/pkgs-aur.txt && echo "listas actualizadas"'
 alias bigpkgs='expac -H M "%m\t%n" $(pacman -Qqe) | sort -h | tail -25'
 
 # ── Sistema ─────────────────────────────────────────────────
