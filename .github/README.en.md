@@ -2,7 +2,7 @@
 
 **Arch · Hyprland 0.56 · pywal16**
 
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](../LICENSE)
 ![Hyprland 0.56](https://img.shields.io/badge/Hyprland-0.56-3b6ea5)
 ![pywal16](https://img.shields.io/badge/pywal16-color-8a5cf6)
 [![Español](https://img.shields.io/badge/README-Espa%C3%B1ol-lightgrey)](README.md)
@@ -190,4 +190,4 @@ Built on [pywal16](https://github.com/eylles/pywal16),
 
 ## License
 
-MIT, see [LICENSE](LICENSE).
+MIT, see [LICENSE](../LICENSE).
