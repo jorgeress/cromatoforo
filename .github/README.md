@@ -1,4 +1,4 @@
-# cromatóforo
+# Cromatóforo
 
 **Arch · Hyprland 0.56 · pywal16**
 
@@ -13,7 +13,7 @@ completa de un Wayland sobre Arch en la que
 **todo el sistema se pinta a partir del wallpaper**. Cambias el fondo y la barra,
 el lanzador, el terminal, el prompt, las notificaciones, el menú de apagado, el
 monitor de sistema, el editor, el navegador y las aplicaciones GTK y Qt adoptan
-su paleta en la misma pasada.
+su paleta en la misma pasada. (+spotify y steam)
 
 Lo que sigue al fondo y lo que no está en
 [Qué se tematiza y qué no](#qué-se-tematiza-y-qué-no), medido en este equipo.
