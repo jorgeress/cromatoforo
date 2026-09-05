@@ -53,3 +53,4 @@
 # valia de nada: las 125 lineas del fichero estan comentadas, o sea que no hay
 # ni un atajo personalizado dentro.
 .config/Thunar/accels.scm
+.config/hypr/scripts/gallery.sh

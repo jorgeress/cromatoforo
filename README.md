@@ -50,8 +50,9 @@ Y la pantalla de bloqueo, que saca su color del mismo sitio:
 
 ![hyprlock](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/hyprlock.jpg)
 
-Todas se generan con `~/.config/hypr/scripts/gallery.sh`, que la de hyprlock la
-hace en un compositor aparte para no bloquear la sesión de verdad.
+Las de hyprlock no se pueden hacer con `Shift+Print`, claro: se capturan desde
+un Hyprland de usar y tirar con una salida headless dentro, que es lo mismo que
+monta [`hyprlock-test.sh`](.config/hypr/scripts/hyprlock-test.sh).
 
 ---
 
