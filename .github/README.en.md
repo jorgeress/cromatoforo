@@ -46,10 +46,11 @@ turquoise. Images are scaled down, click any of them for the full size.
 | **Zen Browser** | ![zen con akira](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/zen-akira.jpg) | ![zen con kyogre](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/zen-kyogre.jpg) |
 | **Spotify** | ![spotify con akira](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/spotify-akira.jpg) | ![spotify con kyogre](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/spotify-kyogre.jpg) |
 | **Steam** | ![steam con akira](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/steam-akira.jpg) | ![steam con kyogre](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/steam-kyogre.jpg) |
+| **hyprlock** | ![hyprlock con akira](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/hyprlock-akira.jpg) | ![hyprlock con kyogre](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/hyprlock-kyogre.jpg) |
 
-And the lock screen, which takes its colour from the same place:
-
-![hyprlock](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/hyprlock.jpg)
+The lock screen shots cannot be taken with a screenshot key: hyprlock grabs the
+keyboard, so the binding never reaches Hyprland. They come from a throwaway
+compositor with a headless output inside it.
 
 ---
 

@@ -45,14 +45,12 @@ entera.
 | **Zen Browser** | ![zen con akira](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/zen-akira.jpg) | ![zen con kyogre](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/zen-kyogre.jpg) |
 | **Spotify** | ![spotify con akira](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/spotify-akira.jpg) | ![spotify con kyogre](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/spotify-kyogre.jpg) |
 | **Steam** | ![steam con akira](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/steam-akira.jpg) | ![steam con kyogre](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/steam-kyogre.jpg) |
+| **hyprlock** | ![hyprlock con akira](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/hyprlock-akira.jpg) | ![hyprlock con kyogre](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/hyprlock-kyogre.jpg) |
 
-Y la pantalla de bloqueo, que saca su color del mismo sitio:
-
-![hyprlock](https://raw.githubusercontent.com/jorgeress/cromatoforo/media/galeria/hyprlock.jpg)
-
-Las de hyprlock no se pueden hacer con `Shift+Print`, claro: se capturan desde
-un Hyprland de usar y tirar con una salida headless dentro, que es lo mismo que
-monta [`hyprlock-test.sh`](../.config/hypr/scripts/hyprlock-test.sh).
+Las de hyprlock no se pueden hacer con `Shift+Print`: al bloquear, hyprlock se
+apodera del teclado y el atajo no llega a Hyprland. Salen de un compositor de
+usar y tirar con una salida headless dentro, que es lo mismo que monta
+[`hyprlock-test.sh`](../.config/hypr/scripts/hyprlock-test.sh).
 
 ---
 
