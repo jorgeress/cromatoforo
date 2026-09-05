@@ -2,7 +2,7 @@
 
 **Arch · Hyprland 0.56 · pywal16**
 
-[![Licencia: MIT](https://img.shields.io/badge/licencia-MIT-blue.svg)](LICENSE)
+[![Licencia: MIT](https://img.shields.io/badge/licencia-MIT-blue.svg)](../LICENSE)
 ![Hyprland 0.56](https://img.shields.io/badge/Hyprland-0.56-3b6ea5)
 ![pywal16](https://img.shields.io/badge/pywal16-color-8a5cf6)
 [![English](https://img.shields.io/badge/README-English-lightgrey)](README.en.md)
@@ -52,7 +52,7 @@ Y la pantalla de bloqueo, que saca su color del mismo sitio:
 
 Las de hyprlock no se pueden hacer con `Shift+Print`, claro: se capturan desde
 un Hyprland de usar y tirar con una salida headless dentro, que es lo mismo que
-monta [`hyprlock-test.sh`](.config/hypr/scripts/hyprlock-test.sh).
+monta [`hyprlock-test.sh`](../.config/hypr/scripts/hyprlock-test.sh).
 
 ---
 
@@ -312,6 +312,12 @@ pérdida con `dot checkout -f`.
 ├── zen-apply                 engancha el perfil de Zen al userChrome de pywal
 ├── obsidian-apply            engancha el snippet de pywal al vault de Obsidian
 └── dotfiles-bootstrap        deja una maquina recien clonada lista
+.github/
+├── README.md    esto que estas leyendo. Vive aqui y no en la raiz porque
+│                GitHub busca el README en .github/ ANTES que en la raiz,
+│                y asi el home no se llena de ficheros del repo
+├── README.en.md version corta en ingles
+└── workflows/   shellcheck sobre los scripts, en severidad error
 .zshenv       lee env.sh; se ejecuta siempre, hasta en scripts
 .zprofile     login: arranca Hyprland en la tty1
 .zshrc        opciones, historia, completado, teclas, plugins
