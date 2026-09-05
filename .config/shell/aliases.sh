@@ -278,12 +278,19 @@ fastfetch() {
 
     # Reparto en dos cestas: los que caben al lado de los datos y los que
     # solo caben de ancho, para ponerlos encima.
-    local side="" top="" h w path
-    while read -r h w path; do
-        [ -n "$path" ] && [ "${w:-0}" -gt 0 ] 2>/dev/null || continue
+    #
+    # OJO CON EL NOMBRE 'ruta': aqui NO se puede usar 'path'. En zsh 'path' es
+    # el array ligado a PATH, y un 'local path' deja PATH VACIO dentro de la
+    # funcion. Entonces shuf no se encuentra, no se elige dibujo, y fastfetch
+    # sale sin dot art. Encima el sintoma enganya: 'command fastfetch' seguia
+    # funcionando porque zsh ya lo tenia en su tabla de hash, asi que parecia
+    # un fallo del dibujo y no del PATH. En bash no pasa.
+    local side="" top="" h w ruta
+    while read -r h w ruta; do
+        [ -n "$ruta" ] && [ "${w:-0}" -gt 0 ] 2>/dev/null || continue
         [ $(( w + pad_left_min + pad_right + info_w )) -le "$cols" ] &&
-            side+="$h $w $path"$'\n'
-        [ "$w" -le "$cols" ] && top+="$h $w $path"$'\n'
+            side+="$h $w $ruta"$'\n'
+        [ "$w" -le "$cols" ] && top+="$h $w $ruta"$'\n'
     done <<< "$inventory"
 
     local pick="" stacked=0

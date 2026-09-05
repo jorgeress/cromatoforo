@@ -1372,6 +1372,34 @@ Y ahí se cruzan las dos trampas de este README: esas llaves hay que **doblarlas
 en la plantilla** para que pywal las deje pasar. En `shell-tools.sh` se ve
 `${{_wal_eza}}`, que genera `${_wal_eza}`, que es lo que zsh entiende.
 
+### En zsh, `local path` te deja sin `PATH`
+
+El fastfetch con dot art salía sin dibujo, y por toda pista esto:
+
+```
+fastfetch:91: command not found: shuf
+```
+
+Con `shuf` en `/usr/bin/shuf` y `/usr/bin` en el `PATH`. La función hacía:
+
+```sh
+local side="" top="" h w path      # ← aquí
+while read -r h w path; do ...
+```
+
+En zsh `path` es el array ligado a `PATH`, así que `local path` no crea una
+variable nueva: crea una copia local **vacía** y deja el `PATH` en nada durante
+toda la función. En bash no pasa, porque ahí `path` es una variable corriente.
+
+Lo que hizo el diagnóstico más largo de lo necesario es que el síntoma apuntaba
+al sitio equivocado: `command fastfetch`, dentro de la misma función y con el
+mismo `PATH` vacío, seguía funcionando, porque zsh ya lo tenía en su tabla de
+hash de una llamada anterior. O sea que fastfetch se ejecutaba y solo fallaba
+`shuf`, y parecía un problema del dibujo cuando era del `PATH`.
+
+La variable pasó a llamarse `ruta`. Los otros nombres atados de zsh que conviene
+no usar como locales: `cdpath`, `fpath`, `manpath`, `prompt`, `status`.
+
 ### `color9`-`color15` suelen ser duplicados
 
 En la mayoría de paletas que genera pywal, `color9`-`color15` son copias exactas
