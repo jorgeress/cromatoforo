@@ -1,6 +1,15 @@
-# dotfiles: Arch · Hyprland 0.56 · pywal16
+# cromatóforo
 
-Configuración completa de un escritorio Wayland sobre Arch, con una idea de fondo:
+**Arch · Hyprland 0.56 · pywal16**
+
+[![Licencia: MIT](https://img.shields.io/badge/licencia-MIT-blue.svg)](LICENSE)
+![Hyprland 0.56](https://img.shields.io/badge/Hyprland-0.56-3b6ea5)
+![pywal16](https://img.shields.io/badge/pywal16-color-8a5cf6)
+[![English](https://img.shields.io/badge/README-English-lightgrey)](README.en.md)
+
+Un cromatóforo es la célula de pigmento con la que un cefalópodo toma el color de
+lo que tiene detrás. Esto hace lo mismo con un escritorio: es la configuración
+completa de un Wayland sobre Arch en la que
 **todo el sistema se pinta a partir del wallpaper**. Cambias el fondo y la barra,
 el lanzador, el terminal, el prompt, las notificaciones, el menú de apagado, el
 monitor de sistema, el editor, el navegador y las aplicaciones GTK y Qt adoptan
@@ -176,7 +185,7 @@ leen, sin copias ni enlaces simbólicos hacia un directorio de paquetes.
 
 ```bash
 # 1. Clonar como bare
-git clone --bare https://github.com/jorgeress/dotfiles.git "$HOME/.dotfiles"
+git clone --bare https://github.com/jorgeress/cromatoforo.git "$HOME/.dotfiles"
 
 # 2. Alias temporal para esta shell
 alias dot='git --git-dir=$HOME/.dotfiles --work-tree=$HOME'
