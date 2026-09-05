@@ -1,0 +1,55 @@
+# Exclusiones del repo de dotfiles.
+# Con status.showUntrackedFiles=no esto no cambia lo que se ve en `dot status`,
+# pero SI protege de un `dot add -A` o un `dot add .` descuidado.
+
+# ── Nunca, lleva credenciales ────────────────────────────────
+.ssh/
+.gnupg/
+.config/gh/hosts.yml
+.config/obs-studio/plugin_config/obs-websocket/
+.claude.json
+.claude/
+.netrc
+.aws/
+.docker/config.json
+
+# ── Estado binario o no reproducible ─────────────────────────
+.cache/
+.config/dconf/
+.config/pulse/
+.local/share/
+.mozilla/
+.pki/
+
+# ── Estado de aplicaciones, no configuracion ─────────────────
+.config/discord/
+.config/spotify/
+.config/spicetify/
+.config/zen/
+.config/GIMP/
+.config/Code - OSS/
+.vscode-oss/
+.vscode-oss-shared/
+.cargo/
+.nv/
+.config/obs-studio/logs/
+.config/obs-studio/profiler_data/
+.config/obs-studio/crashes/
+
+# ── DaVinci Resolve: no se toca (ver README) ─────────────────
+.config/Blackmagic Design/
+.config/Unknown Organization/
+
+# ── Historiales y temporales ─────────────────────────────────
+.bash_history
+.lesshst
+*.bak
+*.bak2
+*.bak-*
+*.disabled
+
+# Thunar reescribe accels.scm cada vez que se abre y le cambia la mayuscula a
+# la cabecera, asi que salia como modificado un dia si y otro tambien. Y no
+# valia de nada: las 125 lineas del fichero estan comentadas, o sea que no hay
+# ni un atajo personalizado dentro.
+.config/Thunar/accels.scm
