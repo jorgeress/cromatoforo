@@ -1,4 +1,4 @@
-# cromatóforo
+# Chromatophore
 
 **Arch · Hyprland 0.56 · pywal16**
 
