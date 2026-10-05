@@ -359,3 +359,21 @@ hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%-"
 hl.bind("XF86AudioNext",         hl.dsp.exec_cmd("playerctl next"),       { locked = true })
 hl.bind("XF86AudioPlay",         hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
 hl.bind("XF86AudioPrev",         hl.dsp.exec_cmd("playerctl previous"),   { locked = true })
+
+---------------------------------------------------------------
+---- AJUSTES LOCALES ------------------------------------------
+---------------------------------------------------------------
+-- Lo propio de tu maquina va en ~/.config/hypr/local.lua, que no esta en
+-- este repo: asi puedes cambiar atajos, monitores o reglas sin tocar este
+-- fichero ni tener conflictos al actualizar. Se carga al final, para que
+-- gane a todo lo anterior. Si no existe no pasa nada; si tiene un error,
+-- avisa con una notificacion en vez de tirar la config entera.
+local LOCAL = HOME .. "/.config/hypr/local.lua"
+local f = io.open(LOCAL, "r")
+if f then
+    f:close()
+    local ok_local, err = pcall(dofile, LOCAL)
+    if not ok_local then
+        hl.exec_cmd("notify-send -u critical 'hypr/local.lua' " .. string.format("%q", tostring(err)))
+    end
+end

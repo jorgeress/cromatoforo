@@ -64,6 +64,7 @@ usar y tirar con una salida headless dentro, que es lo mismo que monta
   - [El reparto entre zsh y bash](#el-reparto-entre-zsh-y-bash)
 - [Atajos de teclado](#atajos-de-teclado)
 - [Personalización](#personalización)
+  - [Ajustes propios sin tocar el repo](#ajustes-propios-sin-tocar-el-repo)
   - [Wallpaper y paleta](#wallpaper-y-paleta)
   - [Dot art de fastfetch](#dot-art-de-fastfetch)
   - [Waybar](#waybar)
@@ -405,6 +406,22 @@ también con la pantalla bloqueada.
 ---
 
 ## Personalización
+
+### Ajustes propios sin tocar el repo
+
+Dos ficheros que el repo **no** trae y que se cargan al final si existen, así que
+lo que pongas en ellos gana a todo lo anterior:
+
+| Fichero | Lo carga | Para qué |
+|---|---|---|
+| `~/.config/hypr/local.lua` | el final de `hyprland.lua` | atajos, monitores, reglas de ventana, `hl.env`… |
+| `~/.config/shell/local.sh` | el final de `aliases.sh` | alias y funciones tuyos, en bash y zsh |
+
+Así cambias lo que quieras sin editar los ficheros versionados, y un
+`dot pull` no te da conflictos. En `local.lua` tienes `hl` igual que en
+`hyprland.lua`, pero no `HOME`: defínelo con `local HOME = os.getenv("HOME")`.
+Si `local.lua` tiene un error, Hyprland **no** se cae: sigue con la config del
+repo y te avisa con una notificación.
 
 ### Wallpaper y paleta
 

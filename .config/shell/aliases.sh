@@ -67,6 +67,7 @@ alias dota='dot add'
 alias dotc='dot commit -m'
 alias dotp='dot push'
 alias dotl='dot log --oneline -15'
+alias dotd='dot diff'
 
 # ── Snapper ─────────────────────────────────────────────────
 alias snaps='sudo snapper -c root list'
@@ -432,3 +433,9 @@ mkproxies() {
 # Exportar el proyecto de Resolve abierto no se puede desde fuera, pero sí
 # recordar dónde va: backups/ del proyecto actual.
 alias drpdir='echo "Resolve → Project Manager → click derecho → Export Project → $PWD/backups/"'
+
+# ── Ajustes locales ─────────────────────────────────────────
+# Alias y funciones propios de tu maquina, fuera de este repo. Va al final
+# para que pueda redefinir cualquier cosa de arriba. Mismas reglas: tiene
+# que funcionar en bash y en zsh.
+[ -f "$HOME/.config/shell/local.sh" ] && . "$HOME/.config/shell/local.sh"

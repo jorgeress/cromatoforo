@@ -162,6 +162,13 @@ accept the loss with `dot checkout -f`.
                         dotfiles-bootstrap, widgets
 ```
 
+Your own tweaks go in two files the repo does **not** ship, loaded last if they
+exist so they win over everything: `~/.config/hypr/local.lua` (end of
+`hyprland.lua`; `hl` is available, `HOME` is not) and `~/.config/shell/local.sh`
+(end of `aliases.sh`, bash and zsh). No edits to tracked files, no conflicts on
+`dot pull`. An error in `local.lua` doesn't take Hyprland down: it keeps the
+repo's config and sends a notification.
+
 ## Dependencies
 
 Full, regenerable lists live in `~/.config/pkglists/` (`pkglist` alias).
