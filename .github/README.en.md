@@ -12,7 +12,8 @@ whatever is behind it. This does the same to a desktop: a full Wayland setup on
 Arch where **the entire system is painted from the wallpaper**. Change the
 background and the bar, the launcher, the terminal, the prompt, the
 notifications, the power menu, the system monitor, the editor, the browser and
-every GTK and Qt app pick up the new palette in the same pass.
+every GTK and Qt app pick up the new palette in the same pass, and Spotify and
+Steam take it the next time you reopen them.
 
 > This is a condensed English version. **The full documentation is in Spanish**
 > in [README.md](README.md): per-app customisation, keybindings, how to test a
