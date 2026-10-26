@@ -44,9 +44,8 @@ export FZF_DEFAULT_OPTS
 # Los colores de tipo de fichero de eza (di=directorio, ex=ejecutable, ln=
 # enlace...) y los de estado de git SIGNIFICAN algo: los lees sin pensar. Si
 # les impones una paleta sacada de una foto puedes acabar con directorios y
-# ficheros del mismo tono y perder informacion. Esos se dejan como estan, que
-# es lo que dice el apartado "No sigue la paleta, y no es un descuido" del
-# README.
+# ficheros del mismo tono y perder informacion. Esos se dejan como estan, a
+# proposito.
 #
 # Lo que si se tematiza son las columnas que solo son ruido visual: permisos,
 # tamano, propietario, fecha y cabeceras.

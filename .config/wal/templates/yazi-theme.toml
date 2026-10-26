@@ -15,8 +15,7 @@
 #   tipo de fichero (azul carpeta, etc.) y el resaltado de sintaxis del
 #   previsualizador SIGNIFICAN algo: los lees sin pensar. Aplastarlos con una
 #   paleta sacada de una foto te hace perder informacion. Es la misma decision
-#   que se tomo con eza y con bat, y esta explicada en el apartado
-#   "No sigue la paleta, y no es un descuido" del README.
+#   que se tomo con eza y con bat.
 
 [mgr]
 cwd             = {{ fg = "{color6}" }}
