@@ -96,7 +96,8 @@ Modifier: `SUPER`.
 
 ## Dependencies
 
-Full, regenerable lists in `~/.config/pkglists/`.
+Everything the config uses, ready for `pacman -S --needed -`, in
+`~/.config/pkglists/` (installed by `dotfiles-bootstrap --paquetes`).
 
 - **Core:** `hyprland` `waybar` `wofi` `kitty` `hyprlock` `hypridle` `swaync`
   `wlogout` `awww` `python-pywal16` `qt5ct` `qt6ct`

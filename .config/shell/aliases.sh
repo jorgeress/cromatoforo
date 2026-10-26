@@ -20,12 +20,6 @@ alias pfiles='pacman -Ql'
 alias whoowns='pacman -Qo'             # qué paquete trae este fichero
 alias orphans='pacman -Qdtq | ifne sudo pacman -Rns -'
 alias pacclean='paru -Sc && paccache -rk2'
-alias mirrors='sudo reflector --country Spain,France,Portugal --age 12 --protocol https --sort rate --save /etc/pacman.d/mirrorlist'
-# -Qqen es lo nativo (repos oficiales) y -Qqem lo foraneo (AUR). Con -Qqe a
-# secas los paquetes de AUR caen tambien en la lista de repos, y entonces el
-# `pacman -S --needed - < pkgs-repo.txt` de la instalacion aborta entero con un
-# "target not found" en el primero que encuentra.
-alias pkglist='pacman -Qqen > ~/.config/pkglists/pkgs-repo.txt && pacman -Qqem > ~/.config/pkglists/pkgs-aur.txt && echo "listas actualizadas"'
 alias bigpkgs='expac -H M "%m\t%n" $(pacman -Qqe) | sort -h | tail -25'
 
 # ── Sistema ─────────────────────────────────────────────────
@@ -69,12 +63,6 @@ alias dotp='dot push'
 alias dotl='dot log --oneline -15'
 alias dotd='dot diff'
 
-# ── Snapper ─────────────────────────────────────────────────
-alias snaps='sudo snapper -c root list'
-alias snaph='sudo snapper -c home list'
-alias snap='sudo snapper -c root create -d'
-alias snapdiff='sudo snapper -c root status'
-
 # ── Hyprland ────────────────────────────────────────────────
 alias hyprlog='tail -f $XDG_RUNTIME_DIR/hypr/$HYPRLAND_INSTANCE_SIGNATURE/hyprland.log'
 alias hyprerr='hyprctl rollinglog | grep -iE "err|warn"'
@@ -85,12 +73,6 @@ alias hyprver='hyprctl version | head -3'
 # Averiguar la class de una ventana para escribir window_rules
 alias hyprclass='hyprctl activewindow | grep -E "^\s+(class|title|initialClass)"'
 
-# ── GPU híbrida ─────────────────────────────────────────────
-alias nv='prime-run'
-alias gpus='ls -l /dev/dri/by-path'
-alias nvsmi='watch -n1 nvidia-smi'
-alias whichgpu='glxinfo | grep -i "opengl renderer"'
-
 # ── Paleta / rice ───────────────────────────────────────────
 alias wall='~/.config/hypr/scripts/wall.sh'
 alias wallr='~/.config/hypr/scripts/wall.sh random'
@@ -98,10 +80,6 @@ alias palette='wal --preview'
 alias recolor='wal -i "$(cat ~/.cache/current_wallpaper)" -n -q && hyprctl reload'
 alias barreload='pkill -SIGUSR2 waybar'
 alias barlog='pkill waybar; waybar'    # ver errores de waybar en consola
-
-# ── Vídeo / YouTube ─────────────────────────────────────────
-alias ffprobe-info='ffprobe -v error -show_format -show_streams'
-alias resolve='prime-run /opt/resolve/bin/resolve'
 
 # ─────────────────────────────────────────────────────────────
 #  FUNCIONES
@@ -146,22 +124,6 @@ y() {
 
 # lazygit sobre el repo bare de dotfiles, con las mismas rutas que el alias dot.
 alias lazydot='lazygit --git-dir="$HOME/.dotfiles" --work-tree="$HOME"'
-
-# Ficha tecnica de un fichero de audio o video: codec, perfil, formato de pixel,
-# muestreo, canales. Es lo que uno buscaria en mediainfo, pero con ffprobe, que
-# ya viene con ffmpeg. mediainfo se descarto porque su libmediainfo arrastra
-# graphviz, y graphviz arrastra ghostscript, gd, gts y netpbm: unos 200 MB para
-# leer una cabecera.
-#
-# Util sobre todo antes de meter algo en Resolve, que es tiquismiquis con los
-# formatos (de ahi que exista audio2resolve).
-codec() {
-    [ -n "${1:-}" ] || { echo "uso: codec FICHERO"; return 1; }
-    ffprobe -v error -hide_banner \
-        -show_entries format=format_name,duration,size,bit_rate \
-        -show_entries stream=index,codec_type,codec_name,profile,width,height,pix_fmt,r_frame_rate,sample_rate,channels \
-        -of default=noprint_wrappers=1 -- "$1"
-}
 
 # Matar proceso interactivamente
 fkill() {
@@ -378,61 +340,6 @@ else _cur_shell=sh; fi
 command -v starship >/dev/null && eval "$(starship init $_cur_shell)"
 command -v zoxide   >/dev/null && eval "$(zoxide init $_cur_shell)"
 unset _cur_shell
-
-# ─────────────────────────────────────────────────────────────
-#  VÍDEO: proyectos en ~/video
-# ─────────────────────────────────────────────────────────────
-
-# Nuevo proyecto: clona _plantilla con el siguiente número libre.
-#   newvid arch-install  ->  ~/video/002-arch-install/
-newvid() {
-    [ -n "$1" ] || { echo "uso: newvid <nombre-en-kebab-case>"; return 1; }
-    local n d
-    n=$(printf "%03d" $(( $(find ~/video -maxdepth 1 -type d -name '[0-9]*' | wc -l) + 1 )))
-    d=~/video/"$n-$1"
-    [ -e "$d" ] && { echo "ya existe: $d"; return 1; }
-    cp -r ~/video/_plantilla "$d" || return 1
-    sed -i "1s|.*|# ${1//-/ }|" "$d/notas.md"
-    cd "$d" && echo "→ $d"
-}
-
-# Saltar a un proyecto por número o trozo del nombre:  cdvid 002  |  cdvid arch
-cdvid() {
-    local d
-    d=$(find ~/video -maxdepth 1 -type d -name "*$1*" ! -name '_*' | head -1)
-    [ -n "$d" ] && cd "$d" || echo "no encuentro '$1' en ~/video"
-}
-
-# 01-footage -> 02-proxies en DNxHR LB. Sin argumentos usa esas dos carpetas
-# del proyecto actual; con argumentos, los ficheros que le pases.
-mkproxies() {
-    local out="02-proxies" src=() f base
-    if [ $# -gt 0 ]; then
-        src=("$@")
-    else
-        [ -d 01-footage ] || { echo "no estoy en un proyecto (falta 01-footage/)"; return 1; }
-        src=()
-        while IFS= read -r f; do src+=("$f"); done < <(
-            find 01-footage -maxdepth 1 -type f \
-                \( -iname '*.mp4' -o -iname '*.mov' -o -iname '*.mkv' -o -iname '*.avi' \) | sort)
-    fi
-    [ ${#src[@]} -gt 0 ] || { echo "nada que convertir"; return 1; }
-    mkdir -p "$out"
-    for f in "${src[@]}"; do
-        base=$(basename "${f%.*}")
-        [ -f "$out/$base.mov" ] && { echo "skip  $base"; continue; }
-        echo "==> $base"
-        ffmpeg -hide_banner -loglevel error -stats -i "$f" \
-            -c:v dnxhd -profile:v dnxhr_lb -pix_fmt yuv422p \
-            -c:a pcm_s16le -ar 48000 \
-            "$out/$base.mov" || echo "FALLO en $f"
-    done
-    echo "listo → $out ($(du -sh "$out" | cut -f1))"
-}
-
-# Exportar el proyecto de Resolve abierto no se puede desde fuera, pero sí
-# recordar dónde va: backups/ del proyecto actual.
-alias drpdir='echo "Resolve → Project Manager → click derecho → Export Project → $PWD/backups/"'
 
 # ── Ajustes locales ─────────────────────────────────────────
 # Alias y funciones propios de tu maquina, fuera de este repo. Va al final

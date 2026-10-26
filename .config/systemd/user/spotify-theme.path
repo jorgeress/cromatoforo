@@ -1,6 +1,5 @@
 [Unit]
 Description=Vigila si una actualizacion de Spotify se llevo el tema de pywal
-Documentation=file:///home/j0r/.config/hypr/scripts/spotify-theme.sh
 
 [Path]
 # spotify-launcher reescribe state.json en CADA arranque, haya actualizacion o

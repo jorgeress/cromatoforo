@@ -1,13 +1,2 @@
-cbonsai
-cmatrix-git
-davinci-resolve
-paru
-paru-debug
-pipes.sh
 python-pywal16
-spicetify-cli
-ttf-ms-fonts
-tty-clock
-unimatrix-git
 wlogout
-zen-browser-bin

@@ -25,17 +25,9 @@ if not ok or type(C) ~= "table" then C = fallback end
 ---------------------------------------------------------------
 ---- MONITORES ------------------------------------------------
 ---------------------------------------------------------------
--- MSI Stealth 15: la interna suele ser eDP-1.
--- Comprueba el nombre real con: hyprctl monitors
-
-hl.monitor({
-    output   = "eDP-2",
-    mode     = "1920x1080@144",
-    position = "auto",
-    scale    = 1,
-})
-
--- Cualquier monitor externo, auto
+-- Cualquier monitor, en su modo preferido. Para fijar uno concreto
+-- (resolucion, refresco, escala) usa local.lua; el nombre lo da
+-- `hyprctl monitors`.
 hl.monitor({ output = "", mode = "preferred", position = "auto", scale = "auto" })
 
 ---------------------------------------------------------------
@@ -206,16 +198,6 @@ for _, cls in ipairs({ "pavucontrol", "blueman-manager", "nm-connection-editor",
                        "org.gnome.Calculator", "nwg-look", "qt6ct", "thunar" }) do
     hl.window_rule({ match = { class = "^(" .. cls .. ")$" }, float = true })
 end
-
--- DaVinci Resolve: sin blur ni redondeo, opacidad plena.
--- Los colores del grade NO se tocan.
-hl.window_rule({
-    name  = "resolve-clean",
-    match = { class = "^(resolve)$" },
-    opacity  = "1.0 override",
-    rounding = 0,
-    no_blur  = true,
-})
 
 -- Terminal semitransparente, el resto opaco
 hl.window_rule({ match = { class = "^(kitty)$" }, opacity = "0.88 0.80" })
